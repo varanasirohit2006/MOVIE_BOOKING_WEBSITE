@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieTickets - Your Ultimate Movie Booking Experience</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Montserrat:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #5b8996;
+            --secondary: #57728f;
+            --accent: #90cea1;
+            --text: #cccccc;
+            --text-secondary: #cccccc;
+            --dark: #304c63;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            color: var(--text);
+            background: linear-gradient(-45deg, var(--secondary), var(--dark), var(--primary), var(--accent));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: rgba(13, 37, 63, 0.8);
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        .container {
+            width: 85%;
+            margin: auto;
+            overflow: hidden;
+            max-width: 1200px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 3em;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h2 {
+            color: var(--primary);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 10px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 2.2em;
+            margin-top: 40px;
+            position: relative;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        h2.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--primary);
+            transition: width 0.3s ease;
+        }
+
+        h2:hover::after {
+            width: 100px;
+        }
+
+        .feature-box {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 30px 0;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.95);
+            transition: all 0.5s ease;
+            opacity: 0;
+        }
+
+        .feature-box.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .feature-box:hover {
+            transform: translateY(-5px) scale(1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature {
+            display: flex;
+            margin-bottom: 25px;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateX(10px);
+        }
+
+        .feature-icon {
+            font-size: 2.5em;
+            color: var(--primary);
+            margin-right: 25px;
+            min-width: 60px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover .feature-icon {
+            transform: scale(1.2);
+            color: var(--accent);
+        }
+
+        .feature h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.4em;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .feature:hover h3 {
+            color: var(--primary);
+        }
+
+        .feature p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 1.05em;
+            line-height: 1.7;
+        }
+
+        .location {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        .map-container {
+            flex: 1;
+            min-width: 300px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateX(-50px);
+            opacity: 0;
+            transition: all 0.8s ease;
+            height: 500px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .map-container.visible {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        .theater-list {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: translateX(50px);
+            opacity: 0;
+            transition: all 0.8s ease;
+            height: 500px;
+            overflow-y: auto;
+        }
+
+        .theater-list.visible {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .theater {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .theater:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .theater:hover {
+            transform: translateX(10px);
+        }
+
+        .theater h4 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            font-size: 1.3em;
+        }
+
+        .theater p {
+            margin: 5px 0;
+            color: var(--text-secondary);
+            font-size: 0.95em;
+        }
+
+        .theater p:last-child {
+            color: var(--accent);
+            font-weight: 300;
+        }
+
+        .video-container {
+            text-align: center;
+            margin: 60px 0;
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.8s ease;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .video-container.visible {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .video-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--primary), var(--accent));
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        .video-player {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 15px;
+        }
+
+        .video-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .video-controls button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .video-controls button:hover {
+            background: var(--primary);
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            color: white;
+            padding: 18px 35px;
+            margin: 30px 0;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(1, 180, 228, 0.4);
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(1, 180, 228, 0.6);
+            animation: none;
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
+        }
+
+        .play-badge {
+            display: block;
+            margin: 0 auto;
+            width: 200px;
+            height: auto;
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+        }
+
+        .play-badge:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.4));
+        }
+
+        footer {
+            background: rgba(13, 37, 63, 0.9);
+            color: white;
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 60px;
+            backdrop-filter: blur(10px);
+            position: relative;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+            opacity: 0.2;
+            z-index: -1;
+        }
+
+        footer p {
+            margin: 10px 0;
+            color: var(--text-secondary);
+        }
+
+        /* Scroll animations */
+        [data-scroll] {
+            transition: all 0.8s ease;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .location {
+                flex-direction: column;
+            }
+
+            .map-container,
+            .theater-list {
+                width: 100%;
+                height: auto;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            h2 {
+                font-size: 1.8em;
+            }
+
+            .video-container {
+                height: auto;
+            }
+
+            .feature p {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>MovieTickets</h1>
+            <p>Your Ultimate Movie Booking Experience</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="features">
+            <h2 data-scroll>Amazing Features</h2>
+            <div class="feature-box" data-scroll>
+                <div class="feature">
+                    <div class="feature-icon">🎬</div>
+                    <div>
+                        <h3>Easy Booking</h3>
+                        <p>Our intuitive interface lets you book tickets in just a few taps. Browse through the latest
+                            releases, check real-time seat availability, and select your preferred seats with our
+                            interactive theater map. Complete your booking securely in seconds with multiple payment
+                            options including credit cards, digital wallets, and gift cards.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">💰</div>
+                    <div>
+                        <h3>Special Discounts</h3>
+                        <p>Enjoy exclusive discounts tailored just for you. Our loyalty program rewards frequent
+                            moviegoers with points redeemable for free tickets and concessions. Students, seniors, and
+                            military personnel receive special rates. We also offer early bird specials, weekday
+                            promotions, and bundle deals combining tickets with food and drinks.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">🍿</div>
+                    <div>
+                        <h3>Food & Beverage</h3>
+                        <p>Skip the concession stand lines by pre-ordering your favorite snacks and drinks. Choose from
+                            a wide selection of freshly popped popcorn (butter, caramel, or cheese flavored), gourmet
+                            nachos, candy combos, and premium beverages. Your order will be ready for pickup when you
+                            arrive or can be delivered directly to your seat in select theaters.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">📱</div>
+                    <div>
+                        <h3>Mobile Tickets</h3>
+                        <p>Go paperless with our convenient mobile ticketing system. After booking, you'll receive a QR
+                            code ticket that can be scanned directly from your phone at the theater entrance. No more
+                            worrying about lost tickets or waiting in will-call lines. Your ticket history is stored in
+                            the app for easy reference and can be shared with friends via text or email.</p>
+                    </div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon">⏰</div>
+                    <div>
+                        <h3>Showtime Alerts</h3>
+                        <p>Never miss a premiere with our personalized showtime alerts. Follow your favorite movies to
+                            get notifications when tickets go on sale, when new showtimes are added, or when seats are
+                            running low. Set reminders for upcoming releases based on your viewing preferences. Our
+                            smart system even suggests optimal showtimes based on your location and schedule.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="locations">
+            <h2 data-scroll>Our Main Branch</h2>
+            <div class="location">
+                <div class="map-container" data-scroll>
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.215209179245!2d-73.9878449241643!3d40.75798597138948!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c6480299%3A0x55194ec5a1ae072e!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus"
+                        allowfullscreen="" loading="lazy"></iframe>
+                </div>
+                <div class="theater-list" data-scroll>
+                    <h3 style="color: var(--accent); margin-top: 0;">Nearby Theaters</h3>
+                    <div class="theater">
+                        <h4>AMC Empire 25</h4>
+                        <p>234 W 42nd St, New York, NY 10036</p>
+                        <p>0.2 miles from main branch</p>
+                        <p>24 screens | IMAX available | Wheelchair accessible</p>
+                    </div>
+                    <div class="theater">
+                        <h4>Regal E-Walk 13</h4>
+                        <p>247 W 42nd St, New York, NY 10036</p>
+                        <p>0.1 miles from main branch</p>
+                        <p>13 screens | 4DX experience | VIP seating</p>
+                    </div>
+                    <div class="theater">
+                        <h4>Cinépolis Chelsea</h4>
+                        <p>260 W 23rd St, New York, NY 10011</p>
+                        <p>1.5 miles from main branch</p>
+                        <p>Luxury seating | Full-service dining | Cocktail service</p>
+                    </div>
+                    <div class="theater">
+                        <h4>AMC Lincoln Square 13</h4>
+                        <p>1998 Broadway, New York, NY 10023</p>
+                        <p>2.3 miles from main branch</p>
+                        <p>13 screens | Dolby Cinema | Large format screens</p>
+                    </div>
+                    <div class="theater">
+                        <h4>Alamo Drafthouse Downtown</h4>
+                        <p>445 Albee Square W, Brooklyn, NY 11201</p>
+                        <p>4.1 miles from main branch</p>
+                        <p>Specialty programming | In-theater dining | No talking policy</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="app-download">
+            <h2 data-scroll>Download Our App</h2>
+            <div class="video-container" data-scroll>
+                <video id="movieTicketsVideo" class="video-player" poster="video-poster.jpg">
+                    <source src="WhatsApp Video 2025-04-07 at 21.36.34_31cea5ca.mp4" type="video/mp4">
+                    <source src="movietickets-demo.webm" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+
+            </div>
+            <div style="text-align: center;" data-scroll>
+                <p style="font-size: 1.2em; margin-bottom: 20px; color: var(--text);">Available now on the Google Play
+                    Store and Apple App Store</p>
+                <a href="https://play.google.com/store" class="download-btn">Download Now</a>
+            </div>
+            <div style="text-align: center; margin: 40px 0;" data-scroll>
+                <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
+                    alt="Get it on Google Play" class="play-badge">
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2023 MovieTickets. All rights reserved.</p>
+            <p>Contact us: info@movietickets.com | (555) 123-4567</p>
+            <p>Customer service available 24/7 | Follow us on social media @MovieTickets</p>
+            <p>Privacy Policy | Terms of Service | Accessibility Statement</p>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll animation trigger
+        const scrollElements = document.querySelectorAll('[data-scroll]');
+
+        const elementInView = (el, dividend = 1) => {
+            const elementTop = el.getBoundingClientRect().top;
+            return (
+                elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend
+            );
+        };
+
+        const elementOutofView = (el) => {
+            const elementTop = el.getBoundingClientRect().top;
+            return (
+                elementTop > (window.innerHeight || document.documentElement.clientHeight)
+            );
+        };
+
+        const displayScrollElement = (element) => {
+            element.classList.add('visible');
+        };
+
+        const hideScrollElement = (element) => {
+            element.classList.remove('visible');
+        };
+
+        const handleScrollAnimation = () => {
+            scrollElements.forEach((el) => {
+                if (elementInView(el, 1.25)) {
+                    displayScrollElement(el);
+                } else if (elementOutofView(el)) {
+                    hideScrollElement(el);
+                }
+            });
+        };
+
+        window.addEventListener('scroll', () => {
+            handleScrollAnimation();
+        });
+
+        // Initialize - show elements already in view
+        document.addEventListener('DOMContentLoaded', () => {
+            handleScrollAnimation();
+
+            // Autoplay video when it comes into view
+            const video = document.getElementById('movieTicketsVideo');
+            const videoObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        video.play();
+                    } else {
+                        video.pause();
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            videoObserver.observe(video);
+        });
+        const video = document.getElementById('video');
+
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }, { threshold: 1.0 });
+
+        observer.observe(video);
+
+
+    </script>
+</body>
+
+</html>

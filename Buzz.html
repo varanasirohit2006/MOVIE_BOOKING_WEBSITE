@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buzz - BookMyShow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --primary-dark: #b71c1c;
+            --secondary: #f5f5f5;
+            --text-dark: #333;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 25px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .search-container {
+            padding: 20px;
+            background-color: var(--white);
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        #searchInput {
+            padding: 12px 25px;
+            width: 70%;
+            max-width: 600px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: var(--transition);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>');
+            background-repeat: no-repeat;
+            background-position: 15px center;
+            background-size: 18px;
+            padding-left: 45px;
+        }
+        
+        #searchInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(211,47,47,0.2);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+        
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .category-btn {
+            padding: 8px 15px;
+            background-color: var(--white);
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--primary);
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .section-title::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background-color: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .buzz-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .buzz-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .buzz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .buzz-image {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .buzz-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .buzz-card:hover .buzz-image img {
+            transform: scale(1.05);
+        }
+        
+        .buzz-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1;
+        }
+        
+        .buzz-content {
+            padding: 20px;
+        }
+        
+        .buzz-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+        
+        .buzz-description {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .buzz-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .buzz-date {
+            color: var(--text-light);
+        }
+        
+        .buzz-category {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .read-more {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            width: 100%;
+            text-align: center;
+        }
+        
+        .read-more:hover {
+            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            box-shadow: 0 4px 8px rgba(211,47,47,0.3);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            margin: 5% auto;
+            padding: 30px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 25px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: var(--primary);
+        }
+        
+        .modal-title {
+            margin-top: 0;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .modal-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .modal-meta {
+            display: flex;
+            gap: 20px;
+            margin: 15px 0;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        .modal-description {
+            line-height: 1.8;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        .modal-body {
+            margin-bottom: 30px;
+            font-size: 15px;
+            line-height: 1.7;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .facebook {
+            background-color: #3b5998;
+        }
+        
+        .twitter {
+            background-color: #1da1f2;
+        }
+        
+        .whatsapp {
+            background-color: #25d366;
+        }
+        
+        .share-btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        .back-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .back-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        @media (max-width: 768px) {
+            .buzz-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .modal-content {
+                width: 90%;
+                padding: 20px;
+            }
+            
+            .modal-image {
+                height: 250px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #searchInput {
+                width: 85%;
+            }
+            
+            .buzz-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Entertainment Buzz</div>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search for buzz..." onkeyup="searchBuzz()">
+    </div>
+    
+    <div class="container">
+        <div class="categories">
+            <button class="category-btn active" onclick="filterBuzz('all')">All</button>
+            <button class="category-btn" onclick="filterBuzz('movies')">Movies</button>
+            <button class="category-btn" onclick="filterBuzz('music')">Music</button>
+            <button class="category-btn" onclick="filterBuzz('sports')">Sports</button>
+            <button class="category-btn" onclick="filterBuzz('tv')">TV & Web</button>
+            <button class="category-btn" onclick="filterBuzz('events')">Events</button>
+        </div>
+        
+        <h2 class="section-title">Latest Buzz</h2>
+        <div class="buzz-grid" id="buzzContainer">
+            <!-- Buzz cards will be inserted here by JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Buzz Detail Modal -->
+    <div id="buzzModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <img id="modalImage" class="modal-image" src="" alt="Buzz Image">
+            <div class="modal-meta">
+                <div><i class="fas fa-calendar-alt"></i> <span id="modalDate"></span></div>
+                <div><i class="fas fa-tag"></i> <span id="modalCategory"></span></div>
+                <div><i class="fas fa-user"></i> <span id="modalAuthor"></span></div>
+            </div>
+            <p id="modalDescription" class="modal-description"></p>
+            <div id="modalBody" class="modal-body"></div>
+            <div class="modal-footer">
+                <div class="share-buttons">
+                    <div class="share-btn facebook" onclick="shareOnFacebook()"><i class="fab fa-facebook-f"></i></div>
+                    <div class="share-btn twitter" onclick="shareOnTwitter()"><i class="fab fa-twitter"></i></div>
+                    <div class="share-btn whatsapp" onclick="shareOnWhatsApp()"><i class="fab fa-whatsapp"></i></div>
+                </div>
+                <button class="back-btn" onclick="closeModal()">Back to Buzz</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Buzz data
+        const buzzItems = [
+            {
+                id: "hollywood",
+                title: "New Hollywood Blockbuster Announced!",
+                description: "Get ready for an action-packed adventure with the latest superhero film.",
+                image: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "movies",
+                date: "May 15, 2025",
+                author: "Entertainment Weekly",
+                body: "<p>Marvel Studios has officially announced their next big superhero film, 'The Avengers: New Dawn', set to release in summer 2025. The film will bring together all your favorite heroes for an epic battle against a new cosmic threat.</p><p>Director James Gunn revealed that this will be the start of a new trilogy in the Marvel Cinematic Universe, introducing several new characters while saying goodbye to some familiar faces.</p><p>Principal photography is set to begin next month in London and Atlanta, with an all-star cast returning including Robert Downey Jr. as Iron Man, Chris Evans as Captain America, and Scarlett Johansson as Black Widow.</p>",
+                trending: true
+            },
+            {
+                id: "bollywood",
+                title: "Exclusive Interview with Top Bollywood Stars",
+                description: "Catch the latest insights from your favorite Bollywood celebrities.",
+                image: "https://images.unsplash.com/photo-1575936123452-b67c3203c357?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "movies",
+                date: "May 12, 2025",
+                author: "Filmfare",
+                body: "<p>In an exclusive roundtable discussion, top Bollywood stars including Shah Rukh Khan, Deepika Padukone, and Ranveer Singh opened up about the changing landscape of Indian cinema.</p><p>The actors discussed the increasing global appeal of Bollywood films, the importance of streaming platforms, and their upcoming projects. Shah Rukh Khan revealed details about his much-anticipated comeback film, while Deepika shared her experience working on an international project.</p><p>The full interview will be featured in the June issue of Filmfare magazine, hitting stands next week.</p>",
+                trending: true
+            },
+            {
+                id: "music",
+                title: "Upcoming Music Concerts You Can't Miss",
+                description: "Find out which artists are performing live near you!",
+                image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "music",
+                date: "May 10, 2025",
+                author: "Rolling Stone",
+                body: "<p>The summer concert season is heating up with major tours announced across the globe. Taylor Swift will be extending her record-breaking 'Eras Tour' with 15 additional dates in Asia, while The Weeknd prepares for his 'After Hours Til Dawn' stadium tour.</p><p>For rock fans, Metallica and Guns N' Roses have announced a co-headlining tour that will visit 25 cities worldwide. Closer to home, Indian artists like A.R. Rahman and Pritam will be performing at major music festivals across the country.</p><p>Tickets for most shows go on sale this Friday at 10AM local time. Fans are advised to register for presales to secure the best seats.</p>",
+                trending: true
+            },
+            {
+                id: "comedy",
+                title: "Top Stand-up Comedians on Tour",
+                description: "Laugh out loud with the best comedians in the industry.",
+                image: "https://images.unsplash.com/photo-1495727034151-8fdc73e332a8?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "events",
+                date: "May 8, 2025",
+                author: "Comedy Central",
+                body: "<p>The comedy scene is thriving with several top comedians announcing new tours. Dave Chappelle will be embarking on his 'The Dreamer' tour, while Kevin Hart brings his 'Reality Check' show to 30 cities worldwide.</p><p>Indian comedians are also making waves, with Zakir Khan's 'Tathastu' tour selling out within hours and Vir Das preparing for his international 'Wanderlust' tour. Newcomer Rahul Subramanian has also announced his first nationwide tour after the success of his Netflix special.</p><p>Many shows will feature surprise guest appearances, so fans are encouraged to arrive early for the full experience.</p>",
+                trending: false
+            },
+            {
+                id: "sports",
+                title: "Cricket World Cup Latest Updates",
+                description: "Stay informed on the latest matches and team performances.",
+                image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "sports",
+                date: "May 5, 2025",
+                author: "ESPN Cricinfo",
+                body: "<p>The 2025 Cricket World Cup is shaping up to be one of the most competitive tournaments in recent history. Team India has announced their 15-member squad, with Hardik Pandya named as captain for the first time in a World Cup.</p><p>Australia comes in as defending champions, but England and New Zealand are strong contenders. Pakistan's young team has been turning heads in warm-up matches, while South Africa's batting lineup looks formidable.</p><p>The tournament kicks off on June 1st with India taking on Pakistan in what promises to be a blockbuster opening match at the Narendra Modi Stadium in Ahmedabad.</p>",
+                trending: true
+            },
+            {
+                id: "awards",
+                title: "Oscars 2025 - Nomination List Revealed",
+                description: "Find out which films are in the race for the biggest awards.",
+                image: "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "movies",
+                date: "May 3, 2025",
+                author: "The Hollywood Reporter",
+                body: "<p>The Academy of Motion Picture Arts and Sciences has announced the nominations for the 97th Academy Awards. Leading the pack is Christopher Nolan's 'Oppenheimer' with 12 nominations, followed by Martin Scorsese's 'Killers of the Flower Moon' with 10.</p><p>In a historic moment, three Indian films have received nominations across various categories, including a Best Picture nod for SS Rajamouli's 'RRR 2'. The Best Actor category is particularly competitive this year, with Cillian Murphy, Leonardo DiCaprio, and newcomer Rishab Shetty all in contention.</p><p>The Oscars ceremony will take place on March 2, 2025, at the Dolby Theatre in Hollywood.</p>",
+                trending: false
+            },
+            {
+                id: "festivals",
+                title: "Biggest Film Festivals Around the World",
+                description: "Discover the best global film festivals happening this year.",
+                image: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "events",
+                date: "April 30, 2025",
+                author: "Variety",
+                body: "<p>The 2025 film festival circuit promises exciting lineups and special events. Cannes Film Festival will open with a highly anticipated new film from Quentin Tarantino, while Venice has secured the world premiere of Denis Villeneuve's 'Dune: Part Three'.</p><p>Closer to home, the Mumbai Film Festival has announced its dates (October 15-22) and will feature a special tribute to Satyajit Ray's centenary. The festival will showcase over 200 films from 50 countries, with a strong focus on South Asian cinema.</p><p>For aspiring filmmakers, Sundance has opened submissions for its 2025 edition, with a new category dedicated to virtual reality storytelling.</p>",
+                trending: false
+            },
+            {
+                id: "series",
+                title: "Most Anticipated Web Series of 2025",
+                description: "Check out the top-rated upcoming series across streaming platforms.",
+                image: "https://images.unsplash.com/photo-1608889825103-eb94a4c81b00?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "tv",
+                date: "April 28, 2025",
+                author: "Collider",
+                body: "<p>Streaming platforms have unveiled their 2025 slates, with several highly anticipated series in production. Netflix's 'The Witcher: Blood Origin' sequel promises to expand the fantasy universe, while Amazon's 'Lord of the Rings: The Second Age' has already generated buzz with its trailer.</p><p>Indian content is also making waves, with Disney+ Hotstar announcing 'Sacred Games: The Final Chapter' and Prime Video greenlighting a big-budget adaptation of 'The Immortals of Meluha'.</p><p>Newcomer Apple TV+ has several intriguing projects, including a sci-fi series from the creators of 'Dark' and a historical drama starring Dev Patel.</p>",
+                trending: true
+            },
+            {
+                id: "theater",
+                title: "Broadway Shows You Must Watch",
+                description: "Experience the magic of live theatre with these top Broadway productions.",
+                image: "https://images.unsplash.com/photo-1531058244987-b6de66a680e3?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "events",
+                date: "April 25, 2025",
+                author: "Playbill",
+                body: "<p>Broadway's 2025 season is packed with exciting new productions and revivals. The musical adaptation of 'The Great Gatsby' has been breaking box office records, while Hugh Jackman's return to the stage in 'The Music Man' continues to draw crowds.</p><p>For those who prefer drama, Tom Hiddleston's performance in 'Hamlet' has been receiving rave reviews. The play has been extended through December due to popular demand.</p><p>Indian audiences can look forward to several Broadway productions touring internationally, including 'Hamilton' which will have a 3-month run in Mumbai starting September.</p>",
+                trending: false
+            },
+            {
+                id: "dance",
+                title: "Top Dance Performances of the Year",
+                description: "Witness stunning choreography and performances.",
+                image: "https://images.unsplash.com/photo-1547153760-18fc86324498?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "events",
+                date: "April 22, 2025",
+                author: "Dance Magazine",
+                body: "<p>The dance world is gearing up for an exciting year with major performances and competitions. The Bolshoi Ballet will be touring with a new production of 'Swan Lake', while Alvin Ailey American Dance Theater celebrates its 65th anniversary with a special program.</p><p>In India, the Nritya Sangam festival will feature performances by 50 dance companies from across the country, showcasing classical and contemporary styles. Kathak maestro Pandit Birju Maharaj's disciples will present a special tribute to the late legend.</p><p>Street dance enthusiasts can look forward to the World Hip Hop Dance Championship in Las Vegas, where India will be fielding a strong team this year.</p>",
+                trending: false
+            },
+            {
+                id: "superhero",
+                title: "Marvel's Upcoming Movies Revealed",
+                description: "Get the scoop on Marvel's next big cinematic hits.",
+                image: "https://images.unsplash.com/photo-1635805737707-575885ab0820?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "movies",
+                date: "April 20, 2025",
+                author: "Marvel Entertainment",
+                body: "<p>Marvel Studios president Kevin Feige has unveiled the Phase 6 slate at Comic-Con, sending fans into a frenzy. The lineup includes 'Fantastic Four', 'X-Men', and 'Avengers: Secret Wars', marking the conclusion of the Multiverse Saga.</p><p>Surprise announcements included the casting of John Krasinski as Reed Richards in 'Fantastic Four' and the return of Hugh Jackman as Wolverine in 'Deadpool 3'. Feige also confirmed that Tom Holland will continue as Spider-Man in a new trilogy.</p><p>The presentation ended with a teaser for 'Avengers: Secret Wars' that featured cameos from multiple versions of characters from across the Marvel multiverse, setting up what promises to be the biggest Marvel movie ever.</p>",
+                trending: true
+            },
+            {
+                id: "kpop",
+                title: "K-Pop World Tour Announcements",
+                description: "Your favorite K-Pop groups are coming to a city near you!",
+                image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&h=400&q=80",
+                category: "music",
+                date: "April 18, 2025",
+                author: "Billboard Korea",
+                body: "<p>The biggest names in K-Pop have announced world tours for 2025, with stops in multiple Indian cities. BTS will be embarking on their 'Yet To Come' tour, with shows in Mumbai, Delhi, and Bangalore. BLACKPINK's 'Born Pink' tour has added 10 new dates due to overwhelming demand.</p><p>Newer groups like NewJeans and IVE will be making their Indian debuts as part of the K-Wave Festival in August. The festival will also feature K-drama stars, fashion shows, and Korean food festivals.</p><p>Ticket sales begin next week, with fan club members getting early access. Organizers have promised enhanced security measures to ensure a safe experience for all concert-goers.</p>",
+                trending: true
+            }
+        ];
+
+        // DOM elements
+        const buzzContainer = document.getElementById('buzzContainer');
+        const modal = document.getElementById('buzzModal');
+        const closeBtn = document.querySelector('.close');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        
+        // Display buzz items
+        function displayBuzz() {
+            buzzContainer.innerHTML = '';
+            
+            const trendingBuzz = buzzItems.filter(item => item.trending);
+            const regularBuzz = buzzItems.filter(item => !item.trending);
+            
+            trendingBuzz.forEach(item => {
+                createBuzzCard(item, true);
+            });
+            
+            regularBuzz.forEach(item => {
+                createBuzzCard(item, false);
+            });
+        }
+        
+        // Create buzz card element
+        function createBuzzCard(item, isTrending) {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'buzz-card';
+            cardElement.innerHTML = `
+                <div class="buzz-image">
+                    <img src="${item.image}" alt="${item.title}">
+                    ${isTrending ? `<div class="buzz-badge">Trending</div>` : ''}
+                </div>
+                <div class="buzz-content">
+                    <h3 class="buzz-title">${item.title}</h3>
+                    <p class="buzz-description">${item.description}</p>
+                    <div class="buzz-meta">
+                        <span class="buzz-date"><i class="far fa-calendar-alt"></i> ${item.date}</span>
+                        <span class="buzz-category">${item.category.toUpperCase()}</span>
+                    </div>
+                    <button class="read-more" onclick="openBuzzModal('${item.id}')">Read More</button>
+                </div>
+            `;
+            buzzContainer.appendChild(cardElement);
+        }
+        
+        // Filter buzz by category
+        function filterBuzz(category) {
+            // Update active category button
+            categoryBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === category || 
+                    (category === 'all' && btn.textContent.toLowerCase() === 'all')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            if (category === 'all') {
+                displayBuzz();
+                return;
+            }
+            
+            buzzContainer.innerHTML = '';
+            
+            const filteredBuzz = buzzItems.filter(item => item.category === category);
+            const trendingFiltered = filteredBuzz.filter(item => item.trending);
+            const regularFiltered = filteredBuzz.filter(item => !item.trending);
+            
+            if (filteredBuzz.length > 0) {
+                document.querySelector('.section-title').textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Buzz`;
+                trendingFiltered.forEach(item => {
+                    createBuzzCard(item, true);
+                });
+                regularFiltered.forEach(item => {
+                    createBuzzCard(item, false);
+                });
+            } else {
+                document.querySelector('.section-title').textContent = "No Results Found";
+                buzzContainer.innerHTML = '<p style="grid-column:1/-1;text-align:center;">No buzz items match your selection. Try another category.</p>';
+            }
+        }
+        
+        // Search buzz
+        function searchBuzz() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredBuzz = buzzItems.filter(item => 
+                item.title.toLowerCase().includes(searchTerm) || 
+                item.description.toLowerCase().includes(searchTerm) ||
+                item.author.toLowerCase().includes(searchTerm) ||
+                item.body.toLowerCase().includes(searchTerm)
+            );
+            
+            buzzContainer.innerHTML = '';
+            
+            if (filteredBuzz.length > 0) {
+                document.querySelector('.section-title').textContent = "Search Results";
+                const trendingFiltered = filteredBuzz.filter(item => item.trending);
+                const regularFiltered = filteredBuzz.filter(item => !item.trending);
+                
+                trendingFiltered.forEach(item => {
+                    createBuzzCard(item, true);
+                });
+                regularFiltered.forEach(item => {
+                    createBuzzCard(item, false);
+                });
+            } else {
+                document.querySelector('.section-title').textContent = "No Results Found";
+                buzzContainer.innerHTML = '<p style="grid-column:1/-1;text-align:center;">No buzz items match your search. Try different keywords.</p>';
+            }
+        }
+        
+        // Open buzz modal
+        function openBuzzModal(buzzId) {
+            const buzzItem = buzzItems.find(item => item.id === buzzId);
+            document.getElementById('modalTitle').textContent = buzzItem.title;
+            document.getElementById('modalImage').src = buzzItem.image;
+            document.getElementById('modalDate').textContent = buzzItem.date;
+            document.getElementById('modalCategory').textContent = buzzItem.category.charAt(0).toUpperCase() + buzzItem.category.slice(1);
+            document.getElementById('modalAuthor').textContent = buzzItem.author;
+            document.getElementById('modalDescription').textContent = buzzItem.description;
+            document.getElementById('modalBody').innerHTML = buzzItem.body;
+            
+            // Store current buzz ID for sharing
+            document.getElementById('buzzModal').dataset.currentBuzz = buzzId;
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Close modal
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal when clicking X or outside
+        closeBtn.onclick = closeModal;
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+        
+        // Share functions
+        function shareOnFacebook() {
+            const buzzId = document.getElementById('buzzModal').dataset.currentBuzz;
+            const buzzItem = buzzItems.find(item => item.id === buzzId);
+            const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(buzzItem.title)}`;
+            window.open(url, '_blank');
+        }
+        
+        function shareOnTwitter() {
+            const buzzId = document.getElementById('buzzModal').dataset.currentBuzz;
+            const buzzItem = buzzItems.find(item => item.id === buzzId);
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(buzzItem.title)}&url=${encodeURIComponent(window.location.href)}`;
+            window.open(url, '_blank');
+        }
+        
+        function shareOnWhatsApp() {
+            const buzzId = document.getElementById('buzzModal').dataset.currentBuzz;
+            const buzzItem = buzzItems.find(item => item.id === buzzId);
+            const url = `https://wa.me/?text=${encodeURIComponent(buzzItem.title + ' - ' + window.location.href)}`;
+            window.open(url, '_blank');
+        }
+        
+        // Initialize the page
+        displayBuzz();
+    </script>
+    <!-- Floating Home Button with Text -->
+<a href="index.html"
+style="
+   position: fixed;
+   bottom: 20px;
+   right: 20px;
+   background-color: #2da0a8;
+   color: white;
+   padding: 10px 15px;
+   border-radius: 30px;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   font-size: 16px;
+   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+   z-index: 1000;
+   text-decoration: none;
+   font-weight: 600;
+">
+<ion-icon name="home" style="font-size: 20px;"></ion-icon>
+Home
+</a>
+</body>
+</html>

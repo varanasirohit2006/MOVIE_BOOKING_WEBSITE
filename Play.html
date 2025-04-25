@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plays & Concerts - BookMyShow</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .search-container {
+            padding: 15px;
+            background-color: #e9ecef;
+            text-align: center;
+        }
+        #searchInput {
+            padding: 12px 20px;
+            width: 70%;
+            max-width: 600px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        #searchInput:focus {
+            border-color: #d32f2f;
+            box-shadow: 0 0 8px rgba(211,47,47,0.2);
+        }
+        .plays-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            gap: 25px;
+        }
+        .play-card {
+            background: white;
+            width: 320px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        .play-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+        .play-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 4px solid #d32f2f;
+        }
+        .play-card .card-content {
+            padding: 20px;
+        }
+        .play-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 20px;
+            min-height: 60px;
+        }
+        .play-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .play-card .date-venue {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .play-card .date-venue i {
+            color: #d32f2f;
+        }
+        .book-now {
+            background: linear-gradient(to right, #d32f2f, #f44336);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .book-now:hover {
+            background: linear-gradient(to right, #b71c1c, #d32f2f);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(211,47,47,0.3);
+        }
+        .play-card .price-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .category-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(211,47,47,0.9);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            overflow: auto;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #d32f2f;
+        }
+        @media (max-width: 768px) {
+            .play-card {
+                width: 100%;
+                max-width: 350px;
+            }
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="header">Plays & Concerts</div>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search for plays and concerts..." onkeyup="searchEvents()">
+    </div>
+    
+    <div class="plays-container" id="playsContainer">
+        <!-- Event cards will be inserted here by JavaScript -->
+    </div>
+    
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalDescription"></p>
+            <div id="modalDetails"></div>
+            <button class="book-now" id="confirmBooking">Confirm Booking</button>
+        </div>
+    </div>
+    
+    <script>
+        // Events data with high-quality images
+        const events = [
+            {
+                id: 1,
+                title: "Hamlet - Shakespeare's Classic",
+                description: "Experience the legendary play live on stage with an all-star cast in this breathtaking production of Shakespeare's masterpiece about revenge, betrayal, and madness.",
+                image: "img/81RgjmSTUZL._AC_UF1000,1000_QL80_.jpg",
+                category: "Theater",
+                date: "June 15, 2025",
+                venue: "Royal Shakespeare Theatre, London",
+                price: "₹1,200 - ₹12,000",
+                ticketsLeft: "Limited availability"
+            },
+            {
+                id: 2,
+                title: "Coldplay - Music of the Spheres World Tour",
+                description: "Watch Coldplay perform their biggest hits live in this spectacular stadium show featuring stunning visuals, pyrotechnics, and the band's iconic anthems.",
+                image: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Concert",
+                date: "July 22, 2025",
+                venue: "Wembley Stadium, London",
+                price: "₹5,000 - ₹50,000",
+                ticketsLeft: "Selling fast"
+            },
+            {
+                id: 3,
+                title: "The Lion King - Broadway Special",
+                description: "A magical musical experience for all ages featuring breathtaking puppetry, unforgettable songs, and the beloved story of Simba's journey to become king.",
+                image: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6a3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Musical",
+                date: "August 5-20, 2025",
+                venue: "Lyceum Theatre, London",
+                price: "₹2,500 - ₹25,000",
+                ticketsLeft: "Good availability"
+            },
+            {
+                id: 4,
+                title: "La Traviata - Italian Opera Night",
+                description: "An evening of mesmerizing classical performances featuring Verdi's timeless opera about love, sacrifice, and redemption with world-class singers and orchestra.",
+                image: "https://images.unsplash.com/photo-1501612780327-45045538702b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Opera",
+                date: "September 12, 2025",
+                venue: "Royal Opera House, London",
+                price: "₹3,000 - ₹30,000",
+                ticketsLeft: "Limited"
+            },
+            {
+                id: 5,
+                title: "Linkin Park Tribute Concert",
+                description: "Rock out to the greatest hits of Linkin Park performed by the world's premier tribute band, capturing the raw energy and emotion of the original performances.",
+                image: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Concert",
+                date: "October 18, 2025",
+                venue: "O2 Arena, London",
+                price: "₹1,500 - ₹15,000",
+                ticketsLeft: "Available"
+            },
+            {
+                id: 6,
+                title: "Bollywood Dance Extravaganza",
+                description: "Enjoy a high-energy Bollywood dance performance featuring 50 dancers, vibrant costumes, and all your favorite Bollywood hits in one spectacular show.",
+                image: "https://images.unsplash.com/photo-1547153760-18fc86324498?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Dance",
+                date: "November 5, 2025",
+                venue: "Indira Gandhi Arena, Delhi",
+                price: "₹800 - ₹8,000",
+                ticketsLeft: "Good availability"
+            },
+            {
+                id: 7,
+                title: "International Jazz Festival",
+                description: "Relax to the soothing tunes of world-class jazz musicians from across the globe in this 3-day festival featuring multiple stages and food vendors.",
+                image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Festival",
+                date: "December 10-12, 2025",
+                venue: "Hyde Park, London",
+                price: "₹2,000 - ₹20,000",
+                ticketsLeft: "Available"
+            },
+            {
+                id: 8,
+                title: "Romeo and Juliet - Modern Adaptation",
+                description: "A fresh take on Shakespeare's classic love story set in contemporary times, featuring innovative staging and powerful performances.",
+                image: "https://images.unsplash.com/photo-1542300050-61b45d1a5f6b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Theater",
+                date: "January 15, 2026",
+                venue: "National Theatre, London",
+                price: "₹1,500 - ₹15,000",
+                ticketsLeft: "Good availability"
+            },
+            {
+                id: 9,
+                title: "Ed Sheeran - Mathematics Tour",
+                description: "Ed Sheeran returns to the stage with his loop pedal magic, performing hits from his entire career in this intimate stadium experience.",
+                image: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Concert",
+                date: "February 20, 2026",
+                venue: "Twickenham Stadium, London",
+                price: "₹4,000 - ₹40,000",
+                ticketsLeft: "Very limited"
+            },
+            {
+                id: 10,
+                title: "The Nutcracker - Christmas Special",
+                description: "Tchaikovsky's beloved ballet comes to life with stunning sets, magnificent costumes, and the London Symphony Orchestra performing the iconic score.",
+                image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Ballet",
+                date: "December 20-30, 2025",
+                venue: "Royal Albert Hall, London",
+                price: "₹3,000 - ₹30,000",
+                ticketsLeft: "Selling fast"
+            }
+        ];
+
+        // DOM elements
+        const playsContainer = document.getElementById('playsContainer');
+        const modal = document.getElementById('bookingModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalDetails = document.getElementById('modalDetails');
+        const confirmBooking = document.getElementById('confirmBooking');
+        const closeBtn = document.querySelector('.close');
+
+        // Display all events
+        function displayEvents(eventsToDisplay) {
+            playsContainer.innerHTML = '';
+            eventsToDisplay.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.className = 'play-card';
+                eventCard.innerHTML = `
+                    <div class="category-tag">${event.category}</div>
+                    <div class="price-tag">${event.price}</div>
+                    <img src="${event.image}" alt="${event.title}">
+                    <div class="card-content">
+                        <h3>${event.title}</h3>
+                        <p>${event.description}</p>
+                        <div class="date-venue">
+                            <i class="fas fa-calendar-alt"></i> ${event.date} 
+                            <i class="fas fa-map-marker-alt" style="margin-left: 15px;"></i> ${event.venue}
+                        </div>
+                        <button class="book-now" onclick="openBookingModal(${event.id})">Book Now</button>
+                    </div>
+                `;
+                playsContainer.appendChild(eventCard);
+            });
+        }
+
+        // Open booking modal
+        function openBookingModal(eventId) {
+            const event = events.find(e => e.id === eventId);
+            modalTitle.textContent = event.title;
+            modalDescription.textContent = event.description;
+            modalDetails.innerHTML = `
+                <p><strong>Date:</strong> ${event.date}</p>
+                <p><strong>Venue:</strong> ${event.venue}</p>
+                <p><strong>Price Range:</strong> ${event.price}</p>
+                <p><strong>Availability:</strong> ${event.ticketsLeft}</p>
+                <div style="margin: 20px 0;">
+                    <label for="ticketQuantity" style="display: block; margin-bottom: 8px; font-weight: bold;">Number of Tickets:</label>
+                    <select id="ticketQuantity" style="padding: 8px; width: 100%; border-radius: 4px; border: 1px solid #ddd;">
+                        <option value="1">1 Ticket</option>
+                        <option value="2">2 Tickets</option>
+                        <option value="3">3 Tickets</option>
+                        <option value="4">4 Tickets</option>
+                        <option value="5">5 Tickets</option>
+                        <option value="6">6 Tickets</option>
+                    </select>
+                </div>
+                <div style="margin: 20px 0;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Seating Preference:</label>
+                    <div style="display: flex; gap: 10px;">
+                        <label><input type="radio" name="seating" value="standard" checked> Standard</label>
+                        <label><input type="radio" name="seating" value="premium"> Premium</label>
+                        <label><input type="radio" name="seating" value="vip"> VIP</label>
+                    </div>
+                </div>
+            `;
+            modal.style.display = 'block';
+        }
+
+        // Close modal
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Confirm booking
+        confirmBooking.onclick = function() {
+            const quantity = document.getElementById('ticketQuantity').value;
+            const seating = document.querySelector('input[name="seating"]:checked').value;
+            alert(`Booking confirmed for ${quantity} ${seating} ticket(s)!`);
+            modal.style.display = 'none';
+        }
+
+        // Search functionality
+        function searchEvents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredEvents = events.filter(event => 
+                event.title.toLowerCase().includes(searchTerm) || 
+                event.description.toLowerCase().includes(searchTerm) ||
+                event.category.toLowerCase().includes(searchTerm) ||
+                event.venue.toLowerCase().includes(searchTerm)
+            );
+            displayEvents(filteredEvents);
+        }
+
+        // Initialize the page
+        displayEvents(events);
+    </script>
+    <!-- Floating Home Button with Text -->
+<a href="index.html"
+style="
+   position: fixed;
+   bottom: 20px;
+   right: 20px;
+   background-color: #2da0a8;
+   color: white;
+   padding: 10px 15px;
+   border-radius: 30px;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   font-size: 16px;
+   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+   z-index: 1000;
+   text-decoration: none;
+   font-weight: 600;
+">
+<ion-icon name="home" style="font-size: 20px;"></ion-icon>
+Home
+</a>
+</body>
+</html>

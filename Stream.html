@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream - BookMyShow</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #d32f2f;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .movies-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            gap: 20px;
+        }
+        .movie-card {
+            background: white;
+            width: 280px;
+            margin: 10px;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        .movie-card img {
+            width: 100%;
+            border-radius: 8px;
+            height: 400px;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+        .movie-card h3 {
+            margin: 10px 0;
+            color: #333;
+            font-size: 18px;
+        }
+        .movie-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        .watch-now {
+            background-color: #d32f2f;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .watch-now:hover {
+            background-color: #b71c1c;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            overflow: auto;
+        }
+        .modal-content {
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 900px;
+        }
+        .close {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #d32f2f;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* Search bar */
+        .search-container {
+            padding: 20px;
+            text-align: center;
+            background-color: #f0f0f0;
+        }
+        #searchInput {
+            padding: 10px 15px;
+            width: 60%;
+            max-width: 500px;
+            border: 2px solid #ddd;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+        }
+        #searchInput:focus {
+            border-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Stream Movies</div>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search for movies..." onkeyup="searchMovies()">
+    </div>
+    
+    <div class="movies-container" id="moviesContainer">
+        <!-- Movie cards will be inserted here by JavaScript -->
+    </div>
+    
+    <!-- Modal for video trailer -->
+    <div id="trailerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="video-container" id="videoContainer"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Movie data with actual poster images and YouTube trailer IDs
+        const movies = [
+            {
+                title: "John Wick: Chapter 4",
+                description: "John Wick uncovers a path to defeating The High Table. But before he can earn his freedom, Wick must face off against a new enemy with powerful alliances across the globe.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMDExZGMyOTMtMDgyYi00NGIwLWJhMTEtOTdkZGFjNmZiMTEwXkEyXkFqcGdeQXVyMjM4NTM5NDY@._V1_.jpg",
+                trailerId: "qEVUtrk8_B4"
+            },
+            {
+                title: "Interstellar",
+                description: "A team of explorers travel through a wormhole in space in an attempt to ensure humanity's survival.",
+                poster: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
+                trailerId: "zSWdZVtXT7E"
+            },
+            {
+                title: "The Conjuring",
+                description: "Paranormal investigators Ed and Lorraine Warren work to help a family terrorized by a dark presence in their farmhouse.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMTM3NjA1NDMyMV5BMl5BanBnXkFtZTcwMDQzNDMzOQ@@._V1_.jpg",
+                trailerId: "k10ETZ41q5o"
+            },
+            {
+                title: "Avengers: Endgame",
+                description: "After the devastating events of Avengers: Infinity War, the universe is in ruins. With the help of remaining allies, the Avengers assemble once more in order to reverse Thanos' actions.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMTc5MDE2ODcwNV5BMl5BanBnXkFtZTgwMzI2NzQ2NzM@._V1_.jpg",
+                trailerId: "TcMBFSGVi1c"
+            },
+            {
+                title: "The Notebook",
+                description: "A poor yet passionate young man falls in love with a rich young woman, giving her a sense of freedom, but they are soon separated because of their social differences.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMTk3OTM5Njg5M15BMl5BanBnXkFtZTYwMzA0ODI3._V1_.jpg",
+                trailerId: "FC6biTjEyZw"
+            },
+            {
+                title: "Superbad",
+                description: "Two co-dependent high school seniors are forced to deal with separation anxiety after their plan to stage a booze-soaked party goes awry.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMTc0NjIyMjA2OF5BMl5BanBnXkFtZTcwMzIxNDE1MQ@@._V1_.jpg",
+                trailerId: "4eaZ_48ZYog"
+            },
+            {
+                title: "Toy Story 4",
+                description: "When a new toy called Forky joins Woody and the gang, a road trip alongside old and new friends reveals how big the world can be for a toy.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMTYzMDM4NzkxOV5BMl5BanBnXkFtZTgwNzM1Mzg2NzM@._V1_.jpg",
+                trailerId: "wmiIUN-7qhE"
+            },
+            {
+                title: "The Shawshank Redemption",
+                description: "Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMDFkYTc0MGEtZmNhMC00ZDIzLWFmNTEtODM1ZmRlYWMwMWFmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg",
+                trailerId: "6hB3S9bIaco"
+            },
+            {
+                title: "Inception",
+                description: "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg",
+                trailerId: "YoHD9XEInc0"
+            },
+            {
+                title: "Gladiator",
+                description: "A former Roman General sets out to exact vengeance against the corrupt emperor who murdered his family and sent him into slavery.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMDliMmNhNDEtODUyOS00MjNlLTgxODEtN2U3NzIxMGVkZTA1L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg",
+                trailerId: "owK1qxDselE"
+            },
+            {
+                title: "Harry Potter and the Sorcerer's Stone",
+                description: "An orphaned boy enrolls in a school of wizardry, where he learns the truth about himself, his family and the terrible evil that haunts the magical world.",
+                poster: "https://m.media-amazon.com/images/M/MV5BNjQ3NWNlNmQtMTE5ZS00MDdmLTlkZjUtZTBlM2UxMGFiMTU3XkEyXkFqcGdeQXVyNjUwNzk3NDc@._V1_.jpg",
+                trailerId: "VyHV0BRtdxo"
+            },
+            {
+                title: "Knives Out",
+                description: "A detective investigates the death of a patriarch of an eccentric, combative family.",
+                poster: "https://m.media-amazon.com/images/M/MV5BMGUwZjliMTAtNzAxZi00MWNiLWE2NzgtZGUxMGQxZjhhNDRiXkEyXkFqcGdeQXVyNjU1NzU3MzE@._V1_.jpg",
+                trailerId: "xi-1NchUqMA"
+            }
+        ];
+        
+        // Get DOM elements
+        const moviesContainer = document.getElementById('moviesContainer');
+        const modal = document.getElementById('trailerModal');
+        const videoContainer = document.getElementById('videoContainer');
+        const closeBtn = document.querySelector('.close');
+        
+        // Display all movies
+        function displayMovies(moviesToDisplay) {
+            moviesContainer.innerHTML = '';
+            moviesToDisplay.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card';
+                movieCard.innerHTML = `
+                    <img src="${movie.poster}" alt="${movie.title}">
+                    <h3>${movie.title}</h3>
+                    <p>${movie.description}</p>
+                    <button class="watch-now" onclick="playTrailer('${movie.trailerId}')">Watch Trailer</button>
+                `;
+                moviesContainer.appendChild(movieCard);
+            });
+        }
+        
+        // Play trailer in modal
+        function playTrailer(trailerId) {
+            videoContainer.innerHTML = `<iframe src="https://www.youtube.com/embed/${trailerId}?autoplay=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+            modal.style.display = 'block';
+        }
+        
+        // Close modal
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+            videoContainer.innerHTML = '';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+                videoContainer.innerHTML = '';
+            }
+        }
+        
+        // Search functionality
+        function searchMovies() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredMovies = movies.filter(movie => 
+                movie.title.toLowerCase().includes(searchTerm) || 
+                movie.description.toLowerCase().includes(searchTerm)
+            );
+            displayMovies(filteredMovies);
+        }
+        
+        // Initialize the page
+        displayMovies(movies);
+    </script>
+    <!-- Floating Home Button with Text -->
+<a href="index.html"
+style="
+   position: fixed;
+   bottom: 20px;
+   right: 20px;
+   background-color: #2da0a8;
+   color: white;
+   padding: 10px 15px;
+   border-radius: 30px;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   font-size: 16px;
+   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+   z-index: 1000;
+   text-decoration: none;
+   font-weight: 600;
+">
+<ion-icon name="home" style="font-size: 20px;"></ion-icon>
+Home
+</a>
+</body>
+</html>

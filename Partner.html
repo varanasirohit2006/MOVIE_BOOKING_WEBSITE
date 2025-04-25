@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paid Partnerships & Promotions</title>
+    <style>
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .header {
+            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .container {
+            width: 85%;
+            max-width: 1200px;
+            margin: 30px auto;
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.08);
+        }
+        h2 {
+            color: #d32f2f;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 25px;
+        }
+        .partnerships-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        .partnership {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #eee;
+        }
+        .partnership:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        .partnership-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        .partnership-details {
+            padding: 20px;
+        }
+        .partnership-details h3 {
+            margin: 0 0 10px 0;
+            font-size: 20px;
+            color: #222;
+        }
+        .partnership-details p {
+            margin: 0 0 15px 0;
+            color: #666;
+            line-height: 1.5;
+        }
+        .pricing {
+            font-weight: bold;
+            color: #d32f2f;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .contact-button {
+            background: linear-gradient(to right, #d32f2f, #f44336);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .contact-button:hover {
+            background: linear-gradient(to right, #b71c1c, #d32f2f);
+            transform: translateY(-2px);
+        }
+        .contact-form {
+            display: none;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-top: 15px;
+            animation: fadeIn 0.4s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .contact-form input, .contact-form textarea, .contact-form select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        .submit-button {
+            background: linear-gradient(to right, #4CAF50, #2E7D32);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            width: 100%;
+        }
+        .submit-button:hover {
+            background: linear-gradient(to right, #388E3C, #1B5E20);
+        }
+        .tag {
+            display: inline-block;
+            background: #FFC107;
+            color: #333;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .testimonial {
+            font-style: italic;
+            color: #666;
+            border-left: 3px solid #d32f2f;
+            padding-left: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">🌟 Paid Partnerships & Promotions</div>
+    <div class="container">
+        <h2>Grow Your Business With Our Marketing Solutions</h2>
+        
+        <div class="partnerships-grid">
+            <!-- Brand Promotion -->
+            <div class="partnership">
+                <img src="https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+                     alt="Brand Promotion" class="partnership-img">
+                <div class="partnership-details">
+                    <span class="tag">Most Popular</span>
+                    <h3>Brand Promotions</h3>
+                    <p>Advertise your brand to our 1M+ monthly visitors across India. Perfect for new product launches.</p>
+                    <div class="testimonial">"Our sales grew by 40% after partnering with them!" - UrbanTees Clothing</div>
+                    <p class="pricing">Starting from ₹15,000/month</p>
+                    <button class="contact-button" onclick="showForm(1)">Get Quote</button>
+                    <div class="contact-form" id="form1">
+                        <input type="text" placeholder="Your Name" required>
+                        <input type="email" placeholder="Business Email" required>
+                        <input type="tel" placeholder="Phone Number" required>
+                        <select required>
+                            <option value="">Select Package</option>
+                            <option value="basic">Basic (₹15k)</option>
+                            <option value="pro">Pro (₹35k)</option>
+                            <option value="enterprise">Enterprise (₹75k)</option>
+                        </select>
+                        <button class="submit-button" onclick="submitForm(1)">Submit Request</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sponsored Events -->
+            <div class="partnership">
+                <img src="https://images.pexels.com/photos/2263436/pexels-photo-2263436.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+                     alt="Sponsored Events" class="partnership-img">
+                <div class="partnership-details">
+                    <span class="tag">Limited Slots</span>
+                    <h3>Sponsored Events</h3>
+                    <p>Feature your brand in our popular events across Mumbai, Delhi & Bangalore. Includes social media coverage.</p>
+                    <div class="testimonial">"Got 500+ leads from one startup expo!" - TechVista Solutions</div>
+                    <p class="pricing">Starting from ₹50,000/event</p>
+                    <button class="contact-button" onclick="showForm(2)">Book Now</button>
+                    <div class="contact-form" id="form2">
+                        <input type="text" placeholder="Company Name" required>
+                        <input type="email" placeholder="Email" required>
+                        <input type="tel" placeholder="Phone" required>
+                        <select required>
+                            <option value="">Select City</option>
+                            <option>Mumbai</option>
+                            <option>Delhi NCR</option>
+                            <option>Bangalore</option>
+                            <option>Hyderabad</option>
+                        </select>
+                        <button class="submit-button" onclick="submitForm(2)">Submit Request</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Influencer Collaborations -->
+            <div class="partnership">
+                <img src="https://images.pexels.com/photos/3760259/pexels-photo-3760259.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+                     alt="Influencer Collaborations" class="partnership-img">
+                <div class="partnership-details">
+                    <span class="tag">Trending</span>
+                    <h3>Influencer Marketing</h3>
+                    <p>Connect with 100+ verified influencers in beauty, tech & lifestyle (10K-1M followers).</p>
+                    <div class="testimonial">"Our app installs doubled with influencer posts!" - FitTrack App</div>
+                    <p class="pricing">Packages from ₹25,000</p>
+                    <button class="contact-button" onclick="showForm(3)">Explore Options</button>
+                    <div class="contact-form" id="form3">
+                        <input type="text" placeholder="Brand Name" required>
+                        <input type="email" placeholder="Email" required>
+                        <select required>
+                            <option value="">Select Category</option>
+                            <option>Beauty & Fashion</option>
+                            <option>Tech & Gadgets</option>
+                            <option>Food & Lifestyle</option>
+                            <option>Fitness & Health</option>
+                        </select>
+                        <textarea placeholder="Campaign Details" rows="3"></textarea>
+                        <button class="submit-button" onclick="submitForm(3)">Get Influencer List</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Corporate Partnerships -->
+            <div class="partnership">
+                <img src="https://images.pexels.com/photos/3184296/pexels-photo-3184296.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+                     alt="Corporate Partnerships" class="partnership-img">
+                <div class="partnership-details">
+                    <span class="tag">Custom Solutions</span>
+                    <h3>Corporate Partnerships</h3>
+                    <p>Tailored campaigns for established brands. Includes PR, media coverage and co-branding.</p>
+                    <div class="testimonial">"Year-long partnership boosted our brand recall by 60%" - HomeTown Retail</div>
+                    <p class="pricing">Custom Pricing</p>
+                    <button class="contact-button" onclick="showForm(4)">Schedule Call</button>
+                    <div class="contact-form" id="form4">
+                        <input type="text" placeholder="Company Name" required>
+                        <input type="text" placeholder="Your Position" required>
+                        <input type="email" placeholder="Work Email" required>
+                        <input type="tel" placeholder="Phone" required>
+                        <textarea placeholder="Partnership Goals" rows="3"></textarea>
+                        <button class="submit-button" onclick="submitForm(4)">Request Proposal</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Show/hide contact forms
+        function showForm(id) {
+            // Hide all forms first
+            document.querySelectorAll('.contact-form').forEach(form => {
+                form.style.display = 'none';
+            });
+            // Show selected form
+            document.getElementById('form'+id).style.display = 'block';
+            // Scroll to form
+            document.getElementById('form'+id).scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Form submission
+        function submitForm(id) {
+            const partnershipTitles = [
+                "", // index 0 empty
+                "Brand Promotion Package",
+                "Sponsored Event Booking",
+                "Influencer Marketing Campaign",
+                "Corporate Partnership"
+            ];
+            
+            alert(`Thank you! Your request for ${partnershipTitles[id]} has been received. Our team will contact you within 24 hours.`);
+            
+            // Reset form
+            document.getElementById('form'+id).style.display = 'none';
+            document.getElementById('form'+id).reset();
+        }
+
+        // Close form when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!event.target.closest('.contact-form') && !event.target.classList.contains('contact-button')) {
+                document.querySelectorAll('.contact-form').forEach(form => {
+                    form.style.display = 'none';
+                });
+            }
+        });
+    </script>
+    <!-- Floating Home Button with Text -->
+<a href="index.html"
+style="
+   position: fixed;
+   bottom: 20px;
+   right: 20px;
+   background-color: #2da0a8;
+   color: white;
+   padding: 10px 15px;
+   border-radius: 30px;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   font-size: 16px;
+   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+   z-index: 1000;
+   text-decoration: none;
+   font-weight: 600;
+">
+<ion-icon name="home" style="font-size: 20px;"></ion-icon>
+Home
+</a>
+</body>
+</html>

@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Events - BookMyShow</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .header {
+            background: linear-gradient(135deg, #d32f2f, #b71c1c);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .search-container {
+            padding: 15px;
+            background-color: #e9ecef;
+            text-align: center;
+        }
+        #searchInput {
+            padding: 12px 20px;
+            width: 70%;
+            max-width: 600px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+        #searchInput:focus {
+            border-color: #d32f2f;
+            box-shadow: 0 0 8px rgba(211,47,47,0.2);
+        }
+        .sports-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            gap: 25px;
+        }
+        .sports-card {
+            background: white;
+            width: 320px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        .sports-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+        }
+        .sports-card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-bottom: 4px solid #d32f2f;
+        }
+        .sports-card .card-content {
+            padding: 20px;
+        }
+        .sports-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+            font-size: 20px;
+            min-height: 60px;
+        }
+        .sports-card p {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .sports-card .date-venue {
+            color: #888;
+            font-size: 13px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .sports-card .date-venue i {
+            color: #d32f2f;
+        }
+        .book-now {
+            background: linear-gradient(to right, #d32f2f, #f44336);
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .book-now:hover {
+            background: linear-gradient(to right, #b71c1c, #d32f2f);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(211,47,47,0.3);
+        }
+        .sports-card .price-tag {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .category-tag {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(211,47,47,0.9);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            overflow: auto;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: #d32f2f;
+        }
+        @media (max-width: 768px) {
+            .sports-card {
+                width: 100%;
+                max-width: 350px;
+            }
+            .modal-content {
+                width: 90%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="header">Sports Events</div>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search for sports events..." onkeyup="searchEvents()">
+    </div>
+    
+    <div class="sports-container" id="sportsContainer">
+        <!-- Sports cards will be inserted here by JavaScript -->
+    </div>
+    
+    <!-- Booking Modal -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modalTitle"></h2>
+            <p id="modalDescription"></p>
+            <div id="modalDetails"></div>
+            <button class="book-now" id="confirmBooking">Confirm Booking</button>
+        </div>
+    </div>
+    
+    <script>
+        // Sports events data with high-quality images
+        const sportsEvents = [
+            {
+                id: 1,
+                title: "IPL 2025 - Mumbai Indians vs Chennai Super Kings",
+                description: "Witness the biggest rivalry in IPL history as Mumbai Indians take on Chennai Super Kings in what promises to be an electrifying match at Wankhede Stadium.",
+                image: "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Cricket",
+                date: "May 15, 2025",
+                venue: "Wankhede Stadium, Mumbai",
+                price: "₹1,500 - ₹15,000",
+                ticketsLeft: "Limited tickets available"
+            },
+            {
+                id: 2,
+                title: "ISL - Kerala Blasters vs Bengaluru FC",
+                description: "Experience the Southern Derby as Kerala Blasters face Bengaluru FC in a high-intensity football match that always delivers drama and excitement.",
+                image: "https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Football",
+                date: "March 22, 2025",
+                venue: "Jawaharlal Nehru Stadium, Kochi",
+                price: "₹500 - ₹5,000",
+                ticketsLeft: "Good availability"
+            },
+            {
+                id: 3,
+                title: "Wimbledon 2025 - Men's Singles Final",
+                description: "Be part of tennis history as the world's best players compete for the prestigious Wimbledon title on the iconic grass courts.",
+                image: "https://images.unsplash.com/photo-1547347298-4074fc3086f0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Tennis",
+                date: "July 13, 2025",
+                venue: "All England Club, London",
+                price: "₹25,000 - ₹1,50,000",
+                ticketsLeft: "Very limited"
+            },
+            {
+                id: 4,
+                title: "NBA Finals - Lakers vs Celtics",
+                description: "The classic NBA rivalry renewed in the championship series. Watch basketball's biggest stars battle for the Larry O'Brien trophy.",
+                image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Basketball",
+                date: "June 15, 2025",
+                venue: "Staples Center, Los Angeles",
+                price: "₹10,000 - ₹1,00,000",
+                ticketsLeft: "Selling fast"
+            },
+            {
+                id: 5,
+                title: "Hockey India League - Delhi vs Punjab",
+                description: "Fast-paced action as Delhi's speed meets Punjab's power in this crucial league encounter that could decide playoff positions.",
+                image: "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Hockey",
+                date: "April 8, 2025",
+                venue: "Major Dhyan Chand Stadium, Delhi",
+                price: "₹300 - ₹3,000",
+                ticketsLeft: "Available"
+            },
+            {
+                id: 6,
+                title: "All England Open Badminton Finals",
+                description: "The world's oldest and most prestigious badminton tournament where only the best reach the final stages.",
+                image: "https://images.unsplash.com/photo-1518604666860-9ed391f76460?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Badminton",
+                date: "March 16, 2025",
+                venue: "Utilita Arena, Birmingham",
+                price: "₹5,000 - ₹50,000",
+                ticketsLeft: "Limited"
+            },
+            {
+                id: 7,
+                title: "WWE WrestleMania 2025",
+                description: "The showcase of the immortals! Experience the largest WWE event of the year with unforgettable moments and surprise appearances.",
+                image: "https://images.unsplash.com/photo-1577982787983-e07c6730f2d3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Wrestling",
+                date: "April 6, 2025",
+                venue: "SoFi Stadium, Los Angeles",
+                price: "₹8,000 - ₹80,000",
+                ticketsLeft: "Available"
+            },
+            {
+                id: 8,
+                title: "Formula 1 - Monaco Grand Prix",
+                description: "The crown jewel of Formula 1 racing through the streets of Monte Carlo. Witness the ultimate test of driver skill and precision.",
+                image: "https://images.unsplash.com/photo-1562184647-3edc6803f16d?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Racing",
+                date: "May 25, 2025",
+                venue: "Circuit de Monaco",
+                price: "₹50,000 - ₹5,00,000",
+                ticketsLeft: "Very limited"
+            },
+            {
+                id: 9,
+                title: "UFC Championship - Heavyweight Title Bout",
+                description: "Two giants of MMA collide in a championship fight that promises knockout power and technical brilliance.",
+                image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "MMA",
+                date: "July 12, 2025",
+                venue: "T-Mobile Arena, Las Vegas",
+                price: "₹15,000 - ₹1,50,000",
+                ticketsLeft: "Selling fast"
+            },
+            {
+                id: 10,
+                title: "The Masters Golf Tournament",
+                description: "Golf's most prestigious major championship at the stunning Augusta National. Watch history being made on the back nine on Sunday.",
+                image: "https://images.unsplash.com/photo-1575425186775-b8de9a427e67?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80",
+                category: "Golf",
+                date: "April 13, 2025",
+                venue: "Augusta National Golf Club",
+                price: "₹75,000 - ₹7,50,000",
+                ticketsLeft: "Lottery only"
+            }
+        ];
+
+        // DOM elements
+        const sportsContainer = document.getElementById('sportsContainer');
+        const modal = document.getElementById('bookingModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalDetails = document.getElementById('modalDetails');
+        const confirmBooking = document.getElementById('confirmBooking');
+        const closeBtn = document.querySelector('.close');
+
+        // Display all sports events
+        function displayEvents(events) {
+            sportsContainer.innerHTML = '';
+            events.forEach(event => {
+                const eventCard = document.createElement('div');
+                eventCard.className = 'sports-card';
+                eventCard.innerHTML = `
+                    <div class="category-tag">${event.category}</div>
+                    <div class="price-tag">${event.price}</div>
+                    <img src="${event.image}" alt="${event.title}">
+                    <div class="card-content">
+                        <h3>${event.title}</h3>
+                        <p>${event.description}</p>
+                        <div class="date-venue">
+                            <i class="fas fa-calendar-alt"></i> ${event.date} 
+                            <i class="fas fa-map-marker-alt" style="margin-left: 15px;"></i> ${event.venue}
+                        </div>
+                        <button class="book-now" onclick="openBookingModal(${event.id})">Book Now</button>
+                    </div>
+                `;
+                sportsContainer.appendChild(eventCard);
+            });
+        }
+
+        // Open booking modal
+        function openBookingModal(eventId) {
+            const event = sportsEvents.find(e => e.id === eventId);
+            modalTitle.textContent = event.title;
+            modalDescription.textContent = event.description;
+            modalDetails.innerHTML = `
+                <p><strong>Date:</strong> ${event.date}</p>
+                <p><strong>Venue:</strong> ${event.venue}</p>
+                <p><strong>Price Range:</strong> ${event.price}</p>
+                <p><strong>Availability:</strong> ${event.ticketsLeft}</p>
+                <div style="margin: 20px 0;">
+                    <label for="ticketQuantity" style="display: block; margin-bottom: 8px; font-weight: bold;">Number of Tickets:</label>
+                    <select id="ticketQuantity" style="padding: 8px; width: 100%; border-radius: 4px; border: 1px solid #ddd;">
+                        <option value="1">1 Ticket</option>
+                        <option value="2">2 Tickets</option>
+                        <option value="3">3 Tickets</option>
+                        <option value="4">4 Tickets</option>
+                        <option value="5">5 Tickets</option>
+                        <option value="6">6 Tickets</option>
+                    </select>
+                </div>
+            `;
+            modal.style.display = 'block';
+        }
+
+        // Close modal
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Confirm booking
+        confirmBooking.onclick = function() {
+            const quantity = document.getElementById('ticketQuantity').value;
+            alert(`Booking confirmed for ${quantity} ticket(s)!`);
+            modal.style.display = 'none';
+        }
+
+        // Search functionality
+        function searchEvents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredEvents = sportsEvents.filter(event => 
+                event.title.toLowerCase().includes(searchTerm) || 
+                event.description.toLowerCase().includes(searchTerm) ||
+                event.category.toLowerCase().includes(searchTerm) ||
+                event.venue.toLowerCase().includes(searchTerm)
+            );
+            displayEvents(filteredEvents);
+        }
+
+        // Initialize the page
+        displayEvents(sportsEvents);
+    </script>
+    <!-- Floating Home Button with Text -->
+<a href="index.html"
+style="
+   position: fixed;
+   bottom: 20px;
+   right: 20px;
+   background-color: #2da0a8;
+   color: white;
+   padding: 10px 15px;
+   border-radius: 30px;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   font-size: 16px;
+   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+   z-index: 1000;
+   text-decoration: none;
+   font-weight: 600;
+">
+<ion-icon name="home" style="font-size: 20px;"></ion-icon>
+Home
+</a>
+</body>
+</html>

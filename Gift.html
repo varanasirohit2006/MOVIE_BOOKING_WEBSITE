@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift Cards - BookMyShow</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #d32f2f;
+            --primary-dark: #b71c1c;
+            --secondary: #f5f5f5;
+            --text-dark: #333;
+            --text-light: #666;
+            --white: #ffffff;
+            --shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--secondary);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 25px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .search-container {
+            padding: 20px;
+            background-color: var(--white);
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        #searchInput {
+            padding: 12px 25px;
+            width: 70%;
+            max-width: 600px;
+            border: 2px solid #ddd;
+            border-radius: 30px;
+            font-size: 16px;
+            outline: none;
+            transition: var(--transition);
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="%23666" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>');
+            background-repeat: no-repeat;
+            background-position: 15px center;
+            background-size: 18px;
+            padding-left: 45px;
+        }
+        
+        #searchInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(211,47,47,0.2);
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+        
+        .section-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--primary);
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .section-title::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 5px;
+            background-color: var(--primary);
+            border-radius: 3px;
+        }
+        
+        .gift-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .gift-card {
+            background: var(--white);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .gift-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+        
+        .gift-card-image {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .gift-card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        
+        .gift-card:hover .gift-card-image img {
+            transform: scale(1.05);
+        }
+        
+        .gift-card-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 1;
+        }
+        
+        .gift-card-content {
+            padding: 20px;
+        }
+        
+        .gift-card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+        
+        .gift-card-description {
+            color: var(--text-light);
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        
+        .gift-card-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .gift-card-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .buy-button {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: var(--white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            flex-grow: 1;
+            text-align: center;
+        }
+        
+        .buy-button:hover {
+            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            box-shadow: 0 4px 8px rgba(211,47,47,0.3);
+        }
+        
+        .wishlist-button {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 20px;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: var(--transition);
+        }
+        
+        .wishlist-button:hover {
+            color: var(--primary);
+        }
+        
+        .categories {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .category-btn {
+            padding: 8px 15px;
+            background-color: var(--white);
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+        
+        .category-btn:hover, .category-btn.active {
+            background-color: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            margin: 5% auto;
+            padding: 30px;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            position: relative;
+        }
+        
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 25px;
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: var(--primary);
+        }
+        
+        .modal-title {
+            margin-top: 0;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .confirm-btn {
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+            transition: var(--transition);
+        }
+        
+        .confirm-btn:hover {
+            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            box-shadow: 0 4px 8px rgba(211,47,47,0.3);
+        }
+        
+        @media (max-width: 768px) {
+            .gift-cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .modal-content {
+                width: 90%;
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            #searchInput {
+                width: 85%;
+            }
+            
+            .gift-cards-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">Gift Cards</div>
+    
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search for gift cards..." onkeyup="searchGiftCards()">
+    </div>
+    
+    <div class="container">
+        <div class="categories">
+            <button class="category-btn active" onclick="filterGiftCards('all')">All</button>
+            <button class="category-btn" onclick="filterGiftCards('shopping')">Shopping</button>
+            <button class="category-btn" onclick="filterGiftCards('food')">Food & Dining</button>
+            <button class="category-btn" onclick="filterGiftCards('entertainment')">Entertainment</button>
+            <button class="category-btn" onclick="filterGiftCards('travel')">Travel</button>
+            <button class="category-btn" onclick="filterGiftCards('lifestyle')">Lifestyle</button>
+        </div>
+        
+        <h2 class="section-title">Popular Gift Cards</h2>
+        <div class="gift-cards-grid" id="giftCardsContainer">
+            <!-- Gift cards will be inserted here by JavaScript -->
+        </div>
+        
+        <h2 class="section-title">Special Offers</h2>
+        <div class="gift-cards-grid" id="specialOffersContainer">
+            <!-- Special offers will be inserted here by JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Purchase Modal -->
+    <div id="purchaseModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 class="modal-title" id="modalTitle">Purchase Gift Card</h2>
+            <div class="form-group">
+                <label for="recipientName">Recipient Name</label>
+                <input type="text" id="recipientName" placeholder="Enter recipient's name">
+            </div>
+            <div class="form-group">
+                <label for="recipientEmail">Recipient Email</label>
+                <input type="email" id="recipientEmail" placeholder="Enter recipient's email">
+            </div>
+            <div class="form-group">
+                <label for="giftAmount">Gift Amount (₹)</label>
+                <select id="giftAmount">
+                    <option value="500">₹500</option>
+                    <option value="1000">₹1000</option>
+                    <option value="1500">₹1500</option>
+                    <option value="2000">₹2000</option>
+                    <option value="5000">₹5000</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="giftMessage">Personal Message (Optional)</label>
+                <input type="text" id="giftMessage" placeholder="Add a personal message">
+            </div>
+            <button class="confirm-btn" id="confirmPurchase">Complete Purchase</button>
+        </div>
+    </div>
+    
+    <script>
+        // Gift card data
+        const giftCards = [
+            {
+                id: "amazon",
+                title: "Amazon Gift Card",
+                description: "Shop millions of products with this versatile gift card",
+                image: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                category: "shopping",
+                price: "₹500 - ₹10,000",
+                offer: "10% extra on ₹1000+",
+                popular: true
+            },
+            {
+                id: "flipkart",
+                title: "Flipkart Gift Card",
+                description: "India's leading online shopping destination",
+                image: "https://images.pexels.com/photos/5632397/pexels-photo-5632397.jpeg?auto=compress&cs=tinysrgb&w=600",
+                category: "shopping",
+                price: "₹500 - ₹5,000",
+                offer: "15% cashback",
+                popular: true
+            },
+            {
+                id: "zomato",
+                title: "Zomato Gift Card",
+                description: "Order from your favorite restaurants with ease",
+                image: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                category: "food",
+                price: "₹200 - ₹2,000",
+                offer: "Free delivery on first order",
+                popular: true
+            },
+            {
+                id: "myntra",
+                title: "Myntra Gift Card",
+                description: "Fashion and lifestyle products from top brands",
+                image: "https://images.pexels.com/photos/934070/pexels-photo-934070.jpeg?auto=compress&cs=tinysrgb&w=600",
+                category: "shopping",
+                price: "₹500 - ₹5,000",
+                offer: "Extra 20% off on brands",
+                popular: true
+            },
+            {
+                id: "netflix",
+                title: "Netflix Gift Card",
+                description: "Unlimited movies, TV shows and more",
+                image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                category: "entertainment",
+                price: "₹199 - ₹1,999",
+                offer: "1 month free on annual plans",
+                popular: true
+            },
+            {
+                id: "dominos",
+                title: "Domino's Gift Card",
+                description: "Delicious pizzas delivered to your doorstep",
+                image: "https://images.pexels.com/photos/2147491/pexels-photo-2147491.jpeg?auto=compress&cs=tinysrgb&w=600",
+                category: "food",
+                price: "₹300 - ₹3,000",
+                offer: "Buy 1 Get 1 Free",
+                popular: false
+            },
+            {
+                id: "nykaa",
+                title: "Nykaa Gift Card",
+                description: "Beauty products from international brands",
+                image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                category: "lifestyle",
+                price: "₹500 - ₹5,000",
+                offer: "25% off on luxury brands",
+                popular: false
+            },
+            {
+                id: "uber",
+                title: "Uber Gift Card",
+                description: "Ride comfortably to your destination",
+                image: "https://images.pexels.com/photos/4482900/pexels-photo-4482900.jpeg?auto=compress&cs=tinysrgb&w=600",
+                category: "travel",
+                price: "₹200 - ₹2,000",
+                offer: "₹100 off on every ride",
+                popular: false
+            },
+            {
+                id: "swiggy",
+                title: "Swiggy Gift Card",
+                description: "Food delivery from your favorite restaurants",
+                image: "https://images.unsplash.com/photo-1600891964599-f61ba0e24092?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                category: "food",
+                price: "₹200 - ₹2,000",
+                offer: "40% off up to ₹100",
+                popular: false
+            },
+            {
+                id: "bookmyshow",
+                title: "BookMyShow Gift Card",
+                description: "Movies, plays, concerts and more",
+                image: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                category: "entertainment",
+                price: "₹300 - ₹3,000",
+                offer: "Free popcorn on first use",
+                popular: true
+            },
+            {
+                id: "ajio",
+                title: "AJIO Gift Card",
+                description: "Trendy fashion for men and women",
+                image: "https://images.pexels.com/photos/996329/pexels-photo-996329.jpeg?auto=compress&cs=tinysrgb&w=600",
+                category: "shopping",
+                price: "₹500 - ₹5,000",
+                offer: "Extra 15% off",
+                popular: false
+            },
+            {
+                id: "spotify",
+                title: "Spotify Gift Card",
+                description: "Millions of songs and podcasts",
+                image: "https://images.unsplash.com/photo-1619983081563-430f63602796?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=600&q=80",
+                category: "entertainment",
+                price: "₹129 - ₹1,299",
+                offer: "3 months free on annual plan",
+                popular: true
+            }
+        ];
+
+        // DOM elements
+        const giftCardsContainer = document.getElementById('giftCardsContainer');
+        const specialOffersContainer = document.getElementById('specialOffersContainer');
+        const modal = document.getElementById('purchaseModal');
+        const closeBtn = document.querySelector('.close');
+        const confirmPurchase = document.getElementById('confirmPurchase');
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        
+        // Display gift cards
+        function displayGiftCards() {
+            giftCardsContainer.innerHTML = '';
+            specialOffersContainer.innerHTML = '';
+            
+            const popularCards = giftCards.filter(card => card.popular);
+            const specialOffers = giftCards.filter(card => !card.popular);
+            
+            popularCards.forEach(card => {
+                createGiftCard(card, giftCardsContainer);
+            });
+            
+            specialOffers.forEach(card => {
+                createGiftCard(card, specialOffersContainer);
+            });
+        }
+        
+        // Create gift card element
+        function createGiftCard(card, container) {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'gift-card';
+            cardElement.innerHTML = `
+                <div class="gift-card-image">
+                    <img src="${card.image}" alt="${card.title}">
+                    ${card.offer ? `<div class="gift-card-badge">Special Offer</div>` : ''}
+                </div>
+                <div class="gift-card-content">
+                    <h3 class="gift-card-title">${card.title}</h3>
+                    <p class="gift-card-description">${card.description}</p>
+                    <div class="gift-card-price">${card.price}</div>
+                    <div class="gift-card-actions">
+                        <button class="wishlist-button" onclick="toggleWishlist('${card.id}')"><i class="far fa-heart"></i></button>
+                        <button class="buy-button" onclick="openPurchaseModal('${card.id}')">Buy Now</button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(cardElement);
+        }
+        
+        // Filter gift cards by category
+        function filterGiftCards(category) {
+            // Update active category button
+            categoryBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === category || 
+                    (category === 'all' && btn.textContent.toLowerCase() === 'all')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            if (category === 'all') {
+                displayGiftCards();
+                return;
+            }
+            
+            giftCardsContainer.innerHTML = '';
+            specialOffersContainer.innerHTML = '';
+            
+            const filteredCards = giftCards.filter(card => card.category === category);
+            const popularFiltered = filteredCards.filter(card => card.popular);
+            const specialFiltered = filteredCards.filter(card => !card.popular);
+            
+            if (popularFiltered.length > 0) {
+                document.querySelector('.section-title').textContent = `Popular ${category.charAt(0).toUpperCase() + category.slice(1)} Gift Cards`;
+                popularFiltered.forEach(card => {
+                    createGiftCard(card, giftCardsContainer);
+                });
+            } else {
+                document.querySelector('.section-title').textContent = `${category.charAt(0).toUpperCase() + category.slice(1)} Gift Cards`;
+            }
+            
+            if (specialFiltered.length > 0) {
+                document.querySelectorAll('.section-title')[1].textContent = `Special ${category.charAt(0).toUpperCase() + category.slice(1)} Offers`;
+                specialFiltered.forEach(card => {
+                    createGiftCard(card, specialOffersContainer);
+                });
+            } else {
+                document.querySelectorAll('.section-title')[1].style.display = 'none';
+            }
+        }
+        
+        // Search gift cards
+        function searchGiftCards() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredCards = giftCards.filter(card => 
+                card.title.toLowerCase().includes(searchTerm) || 
+                card.description.toLowerCase().includes(searchTerm)
+            );
+            
+            giftCardsContainer.innerHTML = '';
+            specialOffersContainer.innerHTML = '';
+            
+            const popularFiltered = filteredCards.filter(card => card.popular);
+            const specialFiltered = filteredCards.filter(card => !card.popular);
+            
+            if (popularFiltered.length > 0) {
+                document.querySelector('.section-title').textContent = "Search Results";
+                popularFiltered.forEach(card => {
+                    createGiftCard(card, giftCardsContainer);
+                });
+            }
+            
+            if (specialFiltered.length > 0) {
+                document.querySelectorAll('.section-title')[1].textContent = "More Results";
+                specialFiltered.forEach(card => {
+                    createGiftCard(card, specialOffersContainer);
+                });
+            }
+        }
+        
+        // Toggle wishlist
+        function toggleWishlist(cardId) {
+            // In a real app, this would add/remove from user's wishlist
+            alert(`Added ${giftCards.find(card => card.id === cardId).title} to your wishlist!`);
+        }
+        
+        // Open purchase modal
+        function openPurchaseModal(cardId) {
+            const card = giftCards.find(card => card.id === cardId);
+            document.getElementById('modalTitle').textContent = `Purchase ${card.title}`;
+            modal.style.display = 'block';
+        }
+        
+        // Close modal
+        closeBtn.onclick = function() {
+            modal.style.display = 'none';
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+        
+        // Confirm purchase
+        confirmPurchase.onclick = function() {
+            const recipientName = document.getElementById('recipientName').value;
+            const amount = document.getElementById('giftAmount').value;
+            
+            if (!recipientName) {
+                alert("Please enter recipient's name");
+                return;
+            }
+            
+            alert(`Gift card purchase confirmed for ${recipientName} (₹${amount})!`);
+            modal.style.display = 'none';
+            
+            // Reset form
+            document.getElementById('recipientName').value = '';
+            document.getElementById('recipientEmail').value = '';
+            document.getElementById('giftAmount').value = '500';
+            document.getElementById('giftMessage').value = '';
+        }
+        
+        // Initialize the page
+        displayGiftCards();
+    </script>
+    <!-- Floating Home Button with Text -->
+<a href="index.html"
+style="
+   position: fixed;
+   bottom: 20px;
+   right: 20px;
+   background-color: #2da0a8;
+   color: white;
+   padding: 10px 15px;
+   border-radius: 30px;
+   display: flex;
+   align-items: center;
+   gap: 8px;
+   font-size: 16px;
+   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+   z-index: 1000;
+   text-decoration: none;
+   font-weight: 600;
+">
+<ion-icon name="home" style="font-size: 20px;"></ion-icon>
+Home
+</a>
+</body>
+</html>

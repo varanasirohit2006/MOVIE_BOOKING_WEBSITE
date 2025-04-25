@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Movie Booking</title>
+    <style>
+        /* ===== Your Original Styles ===== */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #2da0a8;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .genre-section {
+            margin: 30px auto;
+            max-width: 1200px;
+        }
+        .genre-title {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            color: #333;
+            border-left: 5px solid #2da0a8;
+        }
+        .movies-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .movie-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 200px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+        .movie-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .movie-card h3 {
+            margin: 10px;
+            font-size: 1em;
+            text-align: center;
+        }
+        .book-now {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            padding: 8px;
+            background-color: #2da0a8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .book-now:hover {
+            background-color: #1e7d85;
+        }
+        
+        /* ===== Ultra Premium Booking Modal ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            overflow: auto;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            margin: 2% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 85%;
+            max-width: 800px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            color: white;
+            position: relative;
+            animation: fadeIn 0.4s;
+        }
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(-50px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+        .close {
+            position: absolute;
+            right: 25px;
+            top: 15px;
+            color: white;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .close:hover {
+            color: #ff6b6b;
+            transform: rotate(90deg);
+        }
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+        .movie-poster {
+            width: 120px;
+            height: 180px;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .seat-map-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .screen {
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 10px;
+            margin: 0 auto 20px;
+            width: 80%;
+            border-radius: 5px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .seats {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+        .seat {
+            width: 30px;
+            height: 30px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .seat:hover:not(.occupied) {
+            background: rgba(45, 160, 168, 0.7);
+            transform: scale(1.1);
+        }
+        .seat.selected {
+            background: #2da0a8;
+            box-shadow: 0 0 10px rgba(45, 160, 168, 0.7);
+        }
+        .seat.occupied {
+            background: #ff6b6b;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        .seat.prime {
+            background: rgba(253, 187, 45, 0.3);
+            border: 1px solid #fdbb2d;
+        }
+        .seat.vip {
+            background: rgba(178, 31, 31, 0.3);
+            border: 1px solid #b21f1f;
+        }
+        .booking-details {
+            flex: 1;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .booking-steps {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            position: relative;
+            color: rgba(255,255,255,0.5);
+            font-weight: bold;
+        }
+        .step.active {
+            color: white;
+        }
+        .step:not(:last-child):after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: 20px;
+            height: 2px;
+            background: rgba(255,255,255,0.3);
+        }
+        .booking-form {
+            display: none;
+        }
+        .booking-form.active {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: rgba(255,255,255,0.9);
+        }
+        .price-summary {
+            background: rgba(0,0,0,0.5);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .total-price {
+            font-size: 1.2em;
+            font-weight: bold;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-primary {
+            background: #2da0a8;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1e7d85;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        .confirmation {
+            text-align: center;
+            padding: 30px;
+            display: none;
+        }
+        .confirmation-icon {
+            font-size: 60px;
+            color: #2da0a8;
+            margin-bottom: 20px;
+        }
+        .ticket {
+            background: white;
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: left;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .ticket h3 {
+            color: #2da0a8;
+            margin-top: 0;
+        }
+        .ticket-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .seat-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            background: #2da0a8;
+            color: white;
+            border-radius: 3px;
+            margin-right: 5px;
+            font-size: 0.8em;
+        }
+         /* New Emoji Filter Styles */
+         .emoji-filters {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .emoji-filter {
+            font-size: 2.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+            filter: grayscale(100%);
+            opacity: 0.7;
+        }
+        
+        .emoji-filter:hover {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+        
+        .emoji-filter.active {
+            filter: grayscale(0%);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        
+        .genre-section {
+            margin: 30px auto;
+            max-width: 1200px;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== Your Original 48 Movies Exactly As Provided ===== -->
+    <div class="header">Movies</div>
+    
+    <!-- Emoji Filters -->
+    <div class="emoji-filters">
+        <div class="emoji-filter active" onclick="filterMovies('all')">🎬</div>
+        <div class="emoji-filter" onclick="filterMovies('action')">💥</div>
+        <div class="emoji-filter" onclick="filterMovies('horror')">👻</div>
+        <div class="emoji-filter" onclick="filterMovies('comedy')">😂</div>
+        <div class="emoji-filter" onclick="filterMovies('romantic')">❤️</div>
+    </div>
+    
+    <div class="genre-section">
+        <div class="genre-title">Action</div>
+        <div class="movies-container">
+            <!-- Mad Max: Fury Road -->
+            <div class="movie-card">
+                <img src="https://m.media-amazon.com/images/M/MV5BN2EwM2I5OWMtMGQyMi00Zjg1LWJkNTctZTdjYTA4OGUwZjMyXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_FMjpg_UX1000_.jpg" alt="Mad Max: Fury Road">
+                <h3>Mad Max: Fury Road</h3>
+                <button class="book-now" onclick="openBookingModal('Mad Max: Fury Road', 'https://m.media-amazon.com/images/M/MV5BN2EwM2I5OWMtMGQyMi00Zjg1LWJkNTctZTdjYTA4OGUwZjMyXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_FMjpg_UX1000_.jpg', 250)">Book Now</button>
+            </div>
+            
+            <!-- John Wick -->
+            <div class="movie-card">
+                <img src="https://m.media-amazon.com/images/M/MV5BMTU2NjA1ODgzMF5BMl5BanBnXkFtZTgwMTM2MTI4MjE@._V1_.jpg" alt="John Wick">
+                <h3>John Wick</h3>
+                <button class="book-now" onclick="openBookingModal('John Wick', 'https://m.media-amazon.com/images/M/MV5BMTU2NjA1ODgzMF5BMl5BanBnXkFtZTgwMTM2MTI4MjE@._V1_.jpg', 200)">Book Now</button>
+            </div>
+            
+            <!-- Die Hard -->
+            <div class="movie-card">
+                <img src="https://m.media-amazon.com/images/M/MV5BZWIxNzM5YzQtY2FmMS00Yjc3LWI1ZjUtNGVjMjMzZTIxZTIxXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg" alt="Die Hard">
+                <h3>Die Hard</h3>
+                <button class="book-now" onclick="openBookingModal('Die Hard', 'https://m.media-amazon.com/images/M/MV5BZWIxNzM5YzQtY2FmMS00Yjc3LWI1ZjUtNGVjMjMzZTIxZTIxXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg', 220)">Book Now</button>
+            </div>
+          <!-- The Dark Knight -->
+          <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg" alt="The Dark Knight">
+            <h3>The Dark Knight</h3>
+            <button class="book-now" onclick="openBookingModal('The Dark Knight','https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Gladiator -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMDliMmNhNDEtODUyOS00MjNlLTgxODEtN2U3NzIxMGVkZTA1L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg" alt="Gladiator">
+            <h3>Gladiator</h3>
+            <button class="book-now" onclick="openBookingModal('Gladiator','https://m.media-amazon.com/images/M/MV5BMDliMmNhNDEtODUyOS00MjNlLTgxODEtN2U3NzIxMGVkZTA1L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- The Matrix -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg" alt="The Matrix">
+            <h3>The Matrix</h3>
+            <button class="book-now" onclick="openBookingModal('The Matrix','https://m.media-amazon.com/images/M/MV5BNzQzOTk3OTAtNDQ0Zi00ZTVkLWI0MTEtMDllZjNkYzNjNTc4L2ltYWdlXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Inception -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg" alt="Inception">
+            <h3>Inception</h3>
+            <button class="book-now" onclick="openBookingModal('Inception','https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Lethal Weapon -->
+        <div class="movie-card">
+            <img src="img/images.jpeg" alt="Lethal Weapon">
+            <h3>Lethal Weapon</h3>
+            <button class="book-now" onclick="openBookingModal('Lethal Weapon','https://image.tmdb.org/t/p/original/8b8RpKZ8Bkz0d0U8FsJ6Zqo6e3a.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Terminator 2 -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMGU2NzRmZjUtOGUxYS00ZjdjLWEwZWItY2NlM2JhNjkxNTFmXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg" alt="Terminator 2">
+            <h3>Terminator 2</h3>
+            <button class="book-now" onclick="openBookingModal('Terminator 2','https://m.media-amazon.com/images/M/MV5BMGU2NzRmZjUtOGUxYS00ZjdjLWEwZWItY2NlM2JhNjkxNTFmXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Speed -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/I/71BPuv+iRbL._AC_UF1000,1000_QL80_.jpg" alt="Speed">
+            <h3>Speed</h3>
+            <button class="book-now" onclick="openBookingModal('Speed','https://m.media-amazon.com/images/I/71BPuv+iRbL._AC_UF1000,1000_QL80_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- The Bourne Identity -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BM2JkNGU0ZGMtZjVjNS00NjgyLWEyOWYtZmRmZGQyN2IxZjA2XkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg" alt="The Bourne Identity">
+            <h3>The Bourne Identity</h3>
+            <button class="book-now" onclick="openBookingModal('The Bourne Identity','https://m.media-amazon.com/images/M/MV5BM2JkNGU0ZGMtZjVjNS00NjgyLWEyOWYtZmRmZGQyN2IxZjA2XkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Casino Royale -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMDI5ZWJhOWItYTlhOC00YWNhLTlkNzctNDU5YTI1M2E1MWZhXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg" alt="Casino Royale">
+            <h3>Casino Royale</h3>
+            <button class="book-now" onclick="openBookingModal('Casino Royale','https://m.media-amazon.com/images/M/MV5BMDI5ZWJhOWItYTlhOC00YWNhLTlkNzctNDU5YTI1M2E1MWZhXkEyXkFqcGdeQXVyNTIzOTk5ODM@._V1_.jpg',220)">Book Now</button>
+        </div>
+    </div>
+</div>
+
+<div class="genre-section">
+    <div class="genre-title">Horror</div>
+    <div class="movies-container">
+        <!-- The Shining -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BZWFlYmY2MGEtZjVkYS00YzU4LTg0YjQtYzY1ZGE3NTA5NGQxXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg" alt="The Shining">
+            <h3>The Shining</h3>
+            <button class="book-now" onclick="openBookingModal('The Shining','https://m.media-amazon.com/images/M/MV5BZWFlYmY2MGEtZjVkYS00YzU4LTg0YjQtYzY1ZGE3NTA5NGQxXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Get Out -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjUxMDQwNjcyNl5BMl5BanBnXkFtZTgwNzcwMzc0MTI@._V1_.jpg" alt="Get Out">
+            <h3>Get Out</h3>
+            <button class="book-now" onclick="openBookingModal('Get Out','https://m.media-amazon.com/images/M/MV5BMjUxMDQwNjcyNl5BMl5BanBnXkFtZTgwNzcwMzc0MTI@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- A Nightmare on Elm Street -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BNzFjZmM1ODgtMDBkMS00NWFlLTg2YmUtZjc3ZTgxMjE1OTI2L2ltYWdlXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_.jpg" alt="A Nightmare on Elm">
+            <h3>A Nightmare on Elm</h3>
+            <button class="book-now" onclick="openBookingModal('A Nightmare on Elm','https://m.media-amazon.com/images/M/MV5BNzFjZmM1ODgtMDBkMS00NWFlLTg2YmUtZjc3ZTgxMjE1OTI2L2ltYWdlXkEyXkFqcGdeQXVyNTAyODkwOQ@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- The Exorcist -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BYjhmMGMxZDYtMTkyNy00YWVmLTgyYmUtYTU3ZjcwNTBjN2I1XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg" alt="The Exorcist">
+            <h3>The Exorcist</h3>
+            <button class="book-now" onclick="openBookingModal('The Exorcist','https://m.media-amazon.com/images/M/MV5BYjhmMGMxZDYtMTkyNy00YWVmLTgyYmUtYTU3ZjcwNTBjN2I1XkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- It (2017) -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BZDVkZmI0YzAtNzdjYi00ZjhhLWE1ODEtMWMzMWMzNDA0NmQ4XkEyXkFqcGdeQXVyNzYzODM3Mzg@._V1_.jpg" alt="It">
+            <h3>It</h3>
+            <button class="book-now" onclick="openBookingModal('It','https://m.media-amazon.com/images/M/MV5BZDVkZmI0YzAtNzdjYi00ZjhhLWE1ODEtMWMzMWMzNDA0NmQ4XkEyXkFqcGdeQXVyNzYzODM3Mzg@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Halloween -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMzk1OGU2NmMtNTdhZC00NjdlLWE5YTMtZTQ0MGExZTQzOGQyXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg" alt="Halloween">
+            <h3>Halloween</h3>
+            <button class="book-now" onclick="openBookingModal('Halloween','https://m.media-amazon.com/images/M/MV5BMzk1OGU2NmMtNTdhZC00NjdlLWE5YTMtZTQ0MGExZTQzOGQyXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Hereditary -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BOTU5MDg3OGItZWQ1Ny00ZGVmLTg2YTUtMzBkYzQ1YWIwZjlhXkEyXkFqcGdeQXVyNTAzMTY4MDA@._V1_.jpg" alt="Hereditary">
+            <h3>Hereditary</h3>
+            <button class="book-now" onclick="openBookingModal('Hereditary','https://m.media-amazon.com/images/M/MV5BOTU5MDg3OGItZWQ1Ny00ZGVmLTg2YTUtMzBkYzQ1YWIwZjlhXkEyXkFqcGdeQXVyNTAzMTY4MDA@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- The Conjuring -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTM3NjA1NDMyMV5BMl5BanBnXkFtZTcwMDQzNDMzOQ@@._V1_.jpg" alt="The Conjuring">
+            <h3>The Conjuring</h3>
+            <button class="book-now" onclick="openBookingModal('The Conjuring','https://m.media-amazon.com/images/M/MV5BMTM3NjA1NDMyMV5BMl5BanBnXkFtZTcwMDQzNDMzOQ@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Paranormal Activity -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjY1NjcxODQ4MV5BMl5BanBnXkFtZTcwMzUxNjM4Mg@@._V1_.jpg" alt="Paranormal Activity">
+            <h3>Paranormal Activity</h3>
+            <button class="book-now" onclick="openBookingModal('Paranormal Activity','https://m.media-amazon.com/images/M/MV5BMjY1NjcxODQ4MV5BMl5BanBnXkFtZTcwMzUxNjM4Mg@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- The Babadook -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BOTk0NzQyMzQ5OV5BMl5BanBnXkFtZTgwMzA3MTAyMjE@._V1_.jpg" alt="The Babadook">
+            <h3>The Babadook</h3>
+            <button class="book-now" onclick="openBookingModal('The Babadook','https://m.media-amazon.com/images/M/MV5BOTk0NzQyMzQ5OV5BMl5BanBnXkFtZTgwMzA3MTAyMjE@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Insidious -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTYyOTAxMDA0OF5BMl5BanBnXkFtZTcwNzgwNTc1NA@@._V1_.jpg" alt="Insidious">
+            <h3>Insidious</h3>
+            <button class="book-now" onclick="openBookingModal('Insidious','https://m.media-amazon.com/images/M/MV5BMTYyOTAxMDA0OF5BMl5BanBnXkFtZTcwNzgwNTc1NA@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Sinister -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjI5MTg1Njg0Ml5BMl5BanBnXkFtZTcwNzUyNTUyMw@@._V1_.jpg" alt="Sinister">
+            <h3>Sinister</h3>
+            <button class="book-now" onclick="openBookingModal('Sinister','https://m.media-amazon.com/images/M/MV5BMjI5MTg1Njg0Ml5BMl5BanBnXkFtZTcwNzUyNTUyMw@@._V1_.jpg',220)">Book Now</button>
+        </div>
+    </div>
+</div>
+
+<div class="genre-section">
+    <div class="genre-title">Comedy</div>
+    <div class="movies-container">
+        <!-- Superbad -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTc0NjIyMjA2OF5BMl5BanBnXkFtZTcwMzIxNDE1MQ@@._V1_.jpg" alt="Superbad">
+            <h3>Superbad</h3>
+            <button class="book-btn" onclick="openBookingModal('Superbad','https://m.media-amazon.com/images/M/MV5BMTc0NjIyMjA2OF5BMl5BanBnXkFtZTcwMzIxNDE1MQ@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- The Big Lebowski -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTQ0NjUzMDMyOF5BMl5BanBnXkFtZTgwODA1OTU0MDE@._V1_.jpg" alt="The Big Lebowski">
+            <h3>The Big Lebowski</h3>
+            <button class="book-btn" onclick="openBookingModal('The Big Lebowski','https://m.media-amazon.com/images/M/MV5BMTQ0NjUzMDMyOF5BMl5BanBnXkFtZTgwODA1OTU0MDE@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Groundhog Day -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BZWIxNzM5YzQtY2FmMS00Yjc3LWI1ZjUtNGVjMjMzZTIxZTIxXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg" alt="Groundhog Day">
+            <h3>Groundhog Day</h3>
+            <button class="book-btn" onclick="openBookingModal('Groundhog Day','https://m.media-amazon.com/images/M/MV5BZWIxNzM5YzQtY2FmMS00Yjc3LWI1ZjUtNGVjMjMzZTIxZTIxXkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Bridesmaids -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjAyOTMyMDU0NV5BMl5BanBnXkFtZTcwMDI5NDg3NA@@._V1_.jpg" alt="Bridesmaids">
+            <h3>Bridesmaids</h3>
+            <button class="book-btn" onclick="openBookingModal('Bridesmaid','https://m.media-amazon.com/images/M/MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Dumb and Dumber -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BZDQwMjNiMTQtY2UwYy00NjhiLTk0ZWEtZWM5ZWMzNGFjNTVkXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg" alt="Dumb and Dumber">
+            <h3>Dumb and Dumber</h3>
+            <button class="book-btn" onclick="openBookingModal('Dumb and Dumber','https://m.media-amazon.com/images/M/MV5BZDQwMjNiMTQtY2UwYy00NjhiLTk0ZWEtZWM5ZWMzNGFjNTVkXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Step Brothers -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTcwNzUzMjU1OV5BMl5BanBnXkFtZTcwMTk1ODQ1MQ@@._V1_.jpg" alt="Step Brothers">
+            <h3>Step Brothers</h3>
+            <button class="book-btn" onclick="openBookingModal('Step Brothers','https://m.media-amazon.com/images/M/MV5BMTcwNzUzMjU1OV5BMl5BanBnXkFtZTcwMTk1ODQ1MQ@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Anchorman -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTQ2MzYwMzk5Ml5BMl5BanBnXkFtZTcwOTI4NzUyMw@@._V1_.jpg" alt="Anchorman">
+            <h3>Anchorman</h3>
+            <button class="book-btn" onclick="openBookingModal('Anchorman','https://m.media-amazon.com/images/M/MV5BMTQ2MzYwMzk5Ml5BMl5BanBnXkFtZTcwOTI4NzUyMw@@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- The Hangover -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BNGQwZjg5YmYtY2VkNC00NzliLTljYTctNzI5NmU3MjE2ODQzXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg" alt="The Hangover">
+            <h3>The Hangover</h3>
+            <button class="book-btn" onclick="openBookingModal('The Hangover','https://m.media-amazon.com/images/M/MV5BNGQwZjg5YmYtY2VkNC00NzliLTljYTctNzI5NmU3MjE2ODQzXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Monty Python and the Holy Grail -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BN2IyNTE4YzUtZWU0Mi00MGIwLTgyMmQtMzQ4YzQxYWNlYWE2XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_FMjpg_UX1000_.jpg" alt="Monty Python and the Holy Grail">
+            <h3>Monty Python and the Holy Grail</h3>
+            <button class="book-btn" onclick="openBookingModal('Monty Python and the Holy Grail','https://m.media-amazon.com/images/M/MV5BN2IyNTE4YzUtZWU0Mi00MGIwLTgyMmQtMzQ4YzQxYWNlYWE2XkEyXkFqcGdeQXVyNjU0OTQ0OTY@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Tropic Thunder -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BNDE5NjQzMDkzOF5BMl5BanBnXkFtZTcwODI3ODI3MQ@@._V1_FMjpg_UX1000_.jpg" alt="Tropic Thunder">
+            <h3>Tropic Thunder</h3>
+            <button class="book-btn" onclick="openBookingModal('Tropic Thunder','https://m.media-amazon.com/images/M/MV5BNDE5NjQzMDkzOF5BMl5BanBnXkFtZTcwODI3ODI3MQ@@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Shaun of the Dead -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTYxNDMyOTAxN15BMl5BanBnXkFtZTgwMDg1ODYzNTM@._V1_FMjpg_UX1000_.jpg" alt="Shaun of the Dead">
+            <h3>Shaun of the Dead</h3>
+            <button class="book-btn" onclick="openBookingModal('Shaun of the Dead','https://m.media-amazon.com/images/M/MV5BMTYxNDMyOTAxN15BMl5BanBnXkFtZTgwMDg1ODYzNTM@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+    </div>
+</div>
+
+<div class="genre-section">
+    <div class="genre-title">Romantic</div>
+    <div class="movies-container">
+        <!-- The Notebook -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTk3OTM5Njg5M15BMl5BanBnXkFtZTYwMzA0ODI3._V1_FMjpg_UX1000_.jpg" alt="The Notebook">
+            <h3>The Notebook</h3>
+            <button class="book-now" onclick="openBookingModal('The Notebook','https://m.media-amazon.com/images/M/MV5BMTk3OTM5Njg5M15BMl5BanBnXkFtZTYwMzA0ODI3._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Pride & Prejudice -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTA1NDQ3NTcyOTNeQTJeQWpwZ15BbWU3MDA0MzA4MzE@._V1_FMjpg_UX1000_.jpg" alt="Pride & Prejudice">
+            <h3>Pride & Prejudice</h3>
+            <button class="book-now" onclick="openBookingModal('Pride & Prejudice','https://m.media-amazon.com/images/M/MV5BMTA1NDQ3NTcyOTNeQTJeQWpwZ15BbWU3MDA0MzA4MzE@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- La La Land -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMzUzNDM2NzM2MV5BMl5BanBnXkFtZTgwNTM3NTg4OTE@._V1_FMjpg_UX1000_.jpg" alt="La La Land">
+            <h3>La La Land</h3>
+            <button class="book-now" onclick="openBookingModal('La La Land','https://m.media-amazon.com/images/M/MV5BMzUzNDM2NzM2MV5BMl5BanBnXkFtZTgwNTM3NTg4OTE@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Titanic -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMDdmZGU3NDQtY2E5My00ZTliLWIzOTUtMTY4ZGI1YjdiNjk3XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_FMjpg_UX1000_.jpg" alt="Titanic">
+            <h3>Titanic</h3>
+            <button class="book-now" onclick="openBookingModal('Titanic','https://m.media-amazon.com/images/M/MV5BMDdmZGU3NDQtY2E5My00ZTliLWIzOTUtMTY4ZGI1YjdiNjk3XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- A Walk to Remember -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMjE2OTc3OTk2M15BMl5BanBnXkFtZTYwMzAyMjg3._V1_FMjpg_UX1000_.jpg" alt="A Walk to Remember">
+            <h3>A Walk to Remember</h3>
+            <button class="book-now" onclick="openBookingModal('A Walk to Remember','https://m.media-amazon.com/images/M/MV5BMjE2OTc3OTk2M15BMl5BanBnXkFtZTYwMzAyMjg3._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Notting Hill -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BZDdiZTAwYzAtMDI3Ni00OTRjLTkzN2UtYTIxNmFmNjQzNmM4XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_FMjpg_UX1000_.jpg" alt="Notting Hill">
+            <h3>Notting Hill</h3>
+            <button class="book-now" onclick="openBookingModal('Notting Hill','https://m.media-amazon.com/images/M/MV5BZDdiZTAwYzAtMDI3Ni00OTRjLTkzN2UtYTIxNmFmNjQzNmM4XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Before Sunrise -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BZDdiZTAwYzAtMDI3Ni00OTRjLTkzN2UtYTIxNmFmNjQzNmM4XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_.jpg" alt="Before Sunrise">
+            <h3>Before Sunrise</h3>
+            <button class="book-now" onclick="openBookingModal('Before Sunrise','https://m.media-amazon.com/images/M/MV5BZDdiZTAwYzAtMDI3Ni00OTRjLTkzN2UtYTIxNmFmNjQzNmM4XkEyXkFqcGdeQXVyNTA4NzY1MzY@._V1_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- The Fault in Our Stars -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BNTVkMTFiZWItOTFkOC00YTc3LWFhYzQtZTg3NzAxZjJlNTAyXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_FMjpg_UX1000_.jpg" alt="The Fault in Our Stars">
+            <h3>The Fault in Our Stars</h3>
+            <button class="book-now" onclick="openBookingModal('The Fault in Our Stars','https://m.media-amazon.com/images/M/MV5BNTVkMTFiZWItOTFkOC00YTc3LWFhYzQtZTg3NzAxZjJlNTAyXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Crazy Rich Asians -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTYxNDMyOTAxN15BMl5BanBnXkFtZTgwMDg1ODYzNTM@._V1_FMjpg_UX1000_.jpg" alt="Crazy Rich Asians">
+            <h3>Crazy Rich Asians</h3>
+            <button class="book-now" onclick="openBookingModal('Crazy Rich Asians','https://m.media-amazon.com/images/M/MV5BMTYxNDMyOTAxN15BMl5BanBnXkFtZTgwMDg1ODYzNTM@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Sleepless in Seattle -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BODM1ODc3NzQwNF5BMl5BanBnXkFtZTcwNzUyNTUyMw@@._V1_FMjpg_UX1000_.jpg" alt="Sleepless in Seattle">
+            <h3>Sleepless in Seattle</h3>
+            <button class="book-now" onclick="openBookingModal('Sleepless in Seattle','https://m.media-amazon.com/images/M/MV5BODM1ODc3NzQwNF5BMl5BanBnXkFtZTcwNzUyNTUyMw@@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- Moulin Rouge! -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BNDE5NjQzMDkzOF5BMl5BanBnXkFtZTcwODI3ODI3MQ@@._V1_FMjpg_UX1000_.jpg" alt="Moulin Rouge!">
+            <h3>Moulin Rouge!</h3>
+            <button class="book-now" onclick="openBookingModal('Moulin Rouge!','https://m.media-amazon.com/images/M/MV5BNDE5NjQzMDkzOF5BMl5BanBnXkFtZTcwODI3ODI3MQ@@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>
+        
+        <!-- 500 Days of Summer -->
+        <div class="movie-card">
+            <img src="https://m.media-amazon.com/images/M/MV5BMTk5MjM4OTU1OV5BMl5BanBnXkFtZTcwODkzNDIzMw@@._V1_FMjpg_UX1000_.jpg" alt="500 Days of Summer">
+            <h3>500 Days of Summer</h3>
+            <button class="book-now" onclick="openBookingModal('500 Days of Summer','https://m.media-amazon.com/images/M/MV5BMTk5MjM4OTU1OV5BMl5BanBnXkFtZTcwODkzNDIzMw@@._V1_FMjpg_UX1000_.jpg',220)">Book Now</button>
+        </div>   
+            
+        </div>
+    </div>
+
+    
+
+    <!-- ===== Ultra Premium Booking Modal ===== -->
+    <div id="bookingModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            
+            <div class="booking-header">
+                <div>
+                    <h2 id="movieTitle">Movie Title</h2>
+                    <p id="showTimeDisplay">Showtime: 10:00 AM</p>
+                </div>
+                <img id="moviePoster" class="movie-poster" src="" alt="Movie Poster">
+            </div>
+            
+            <div class="booking-steps">
+                <div class="step active" id="step1">1. Select Seats</div>
+                <div class="step" id="step2">2. Your Details</div>
+                <div class="step" id="step3">3. Confirmation</div>
+            </div>
+            
+            <!-- Seat Selection Step -->
+            <div class="booking-form active" id="seatSelectionForm">
+                <div class="screen">SCREEN</div>
+                <div class="seat-map-container">
+                    <div style="flex: 2">
+                        <div class="seats" id="seatsContainer"></div>
+                        <div class="price-summary">
+                            <div class="price-row">
+                                <span>Standard Seats (₹200):</span>
+                                <span id="standardSeats">0</span>
+                            </div>
+                            <div class="price-row">
+                                <span>Prime Seats (₹250):</span>
+                                <span id="primeSeats">0</span>
+                            </div>
+                            <div class="price-row">
+                                <span>VIP Seats (₹300):</span>
+                                <span id="vipSeats">0</span>
+                            </div>
+                            <div class="price-row total-price">
+                                <span>Total:</span>
+                                <span id="totalPrice">₹0</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="booking-details">
+                        <h3>Seat Types</h3>
+                        <p><span class="seat-tag" style="background: rgba(255,255,255,0.2)">Available</span></p>
+                        <p><span class="seat-tag" style="background: #2da0a8">Selected</span></p>
+                        <p><span class="seat-tag" style="background: #fdbb2d">Prime (+₹50)</span></p>
+                        <p><span class="seat-tag" style="background: #b21f1f">VIP (+₹100)</span></p>
+                        <p><span class="seat-tag" style="background: #ff6b6b">Occupied</span></p>
+                        
+                        <div class="form-group" style="margin-top: 20px;">
+                            <label for="showTime">Select Showtime:</label>
+                            <select id="showTime" class="form-control" onchange="updateShowTime()">
+                                <option value="10:00 AM">10:00 AM</option>
+                                <option value="2:00 PM">2:00 PM</option>
+                                <option value="6:00 PM">6:00 PM</option>
+                                <option value="9:00 PM">9:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="nextStep()">Continue</button>
+                </div>
+            </div>
+            
+            <!-- User Details Step -->
+            <div class="booking-form" id="userDetailsForm">
+                <h3>Your Information</h3>
+                <div class="form-group">
+                    <label for="userName">Full Name</label>
+                    <input type="text" id="userName" placeholder="Enter your full name" required>
+                </div>
+                <div class="form-group">
+                    <label for="userEmail">Email Address</label>
+                    <input type="email" id="userEmail" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="userPhone">Phone Number</label>
+                    <input type="tel" id="userPhone" placeholder="Enter your phone number" required>
+                </div>
+                
+                <div class="price-summary">
+                    <h4>Order Summary</h4>
+                    <div id="orderSummary"></div>
+                    <div class="price-row total-price">
+                        <span>Total Payable:</span>
+                        <span id="finalPrice">₹0</span>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="confirmBooking()">Confirm Booking</button>
+                </div>
+            </div>
+            
+            <!-- Confirmation Step -->
+            <div class="confirmation" id="confirmationScreen">
+                <div class="confirmation-icon">✓</div>
+                <h2>Booking Confirmed!</h2>
+                <p>Your tickets have been successfully booked.</p>
+                
+                <div class="ticket">
+                    <h3 id="confirmationMovie">Movie Title</h3>
+                    <div class="ticket-info">
+                        <span>Date:</span>
+                        <span id="confirmationDate"></span>
+                    </div>
+                    <div class="ticket-info">
+                        <span>Time:</span>
+                        <span id="confirmationTime">10:00 AM</span>
+                    </div>
+                    <div class="ticket-info">
+                        <span>Seats:</span>
+                        <span id="confirmationSeats"></span>
+                    </div>
+                    <div class="ticket-info">
+                        <span>Total:</span>
+                        <span id="confirmationTotal">₹0</span>
+                    </div>
+                    <div class="ticket-info">
+                        <span>Booking ID:</span>
+                        <span id="bookingId">BMS-XXXXXX</span>
+                    </div>
+                </div>
+                
+                <p>A confirmation has been sent to <span id="confirmationEmail"></span></p>
+                <button class="btn btn-primary" onclick="closeModal()">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Current booking data
+        let currentBooking = {
+            movie: "",
+            poster: "",
+            basePrice: 200,
+            showTime: "10:00 AM",
+            seats: {
+                standard: [],
+                prime: [],
+                vip: []
+            },
+            userDetails: {
+                name: "",
+                email: "",
+                phone: ""
+            },
+            bookingId: ""
+        };
+        
+        // Open booking modal
+        function openBookingModal(movie, posterUrl, basePrice) {
+            currentBooking = {
+                movie: movie,
+                poster: posterUrl,
+                basePrice: basePrice,
+                showTime: "10:00 AM",
+                seats: { standard: [], prime: [], vip: [] },
+                userDetails: { name: "", email: "", phone: "" },
+                bookingId: "BMS-" + Math.floor(100000 + Math.random() * 900000)
+            };
+            
+            // Update UI
+            document.getElementById("movieTitle").textContent = movie;
+            document.getElementById("moviePoster").src = posterUrl;
+            document.getElementById("showTimeDisplay").textContent = "Showtime: " + currentBooking.showTime;
+            
+            // Generate seats
+            generateSeatMap();
+            
+            // Reset steps
+            document.getElementById("seatSelectionForm").classList.add("active");
+            document.getElementById("userDetailsForm").classList.remove("active");
+            document.getElementById("confirmationScreen").classList.remove("active");
+            document.getElementById("step1").classList.add("active");
+            document.getElementById("step2").classList.remove("active");
+            document.getElementById("step3").classList.remove("active");
+            
+            // Show modal
+            document.getElementById("bookingModal").style.display = "block";
+        }
+        
+        // Generate seat map
+        function generateSeatMap() {
+            const seatsContainer = document.getElementById("seatsContainer");
+            seatsContainer.innerHTML = "";
+            
+            // Create 50 seats (5 rows x 10 columns)
+            for (let row = 1; row <= 5; row++) {
+                for (let col = 1; col <= 10; col++) {
+                    const seatNum = (row-1)*10 + col;
+                    const seat = document.createElement("div");
+                    seat.className = "seat";
+                    seat.textContent = seatNum;
+                    
+                    // Assign seat types (for demo)
+                    if (row === 1) {
+                        seat.classList.add("vip");
+                    } else if (row <= 3) {
+                        seat.classList.add("prime");
+                    }
+                    
+                    // Randomly mark some seats as occupied (20% chance)
+                    if (Math.random() < 0.2) {
+                        seat.classList.add("occupied");
+                    } else {
+                        seat.addEventListener("click", function() {
+                            toggleSeatSelection(this, seatNum);
+                        });
+                    }
+                    
+                    seatsContainer.appendChild(seat);
+                }
+            }
+            
+            updatePriceSummary();
+        }
+        
+        // Toggle seat selection
+        function toggleSeatSelection(seatElement, seatNumber) {
+            // Skip if occupied
+            if (seatElement.classList.contains("occupied")) return;
+            
+            // Determine seat type
+            let seatType = "standard";
+            if (seatElement.classList.contains("prime")) seatType = "prime";
+            if (seatElement.classList.contains("vip")) seatType = "vip";
+            
+            // Toggle selection
+            if (seatElement.classList.contains("selected")) {
+                seatElement.classList.remove("selected");
+                // Remove from selected seats
+                currentBooking.seats[seatType] = currentBooking.seats[seatType].filter(num => num !== seatNumber);
+            } else {
+                seatElement.classList.add("selected");
+                // Add to selected seats
+                currentBooking.seats[seatType].push(seatNumber);
+            }
+            
+            updatePriceSummary();
+        }
+        
+        // Update price summary
+        function updatePriceSummary() {
+            document.getElementById("standardSeats").textContent = currentBooking.seats.standard.length;
+            document.getElementById("primeSeats").textContent = currentBooking.seats.prime.length;
+            document.getElementById("vipSeats").textContent = currentBooking.seats.vip.length;
+            
+            const standardTotal = currentBooking.seats.standard.length * currentBooking.basePrice;
+            const primeTotal = currentBooking.seats.prime.length * (currentBooking.basePrice + 50);
+            const vipTotal = currentBooking.seats.vip.length * (currentBooking.basePrice + 100);
+            const grandTotal = standardTotal + primeTotal + vipTotal;
+            
+            document.getElementById("totalPrice").textContent = "₹" + grandTotal;
+        }
+        
+        // Update show time
+        function updateShowTime() {
+            currentBooking.showTime = document.getElementById("showTime").value;
+            document.getElementById("showTimeDisplay").textContent = "Showtime: " + currentBooking.showTime;
+        }
+        
+        // Navigation between steps
+        function nextStep() {
+            // Validate before proceeding
+            const totalSeats = currentBooking.seats.standard.length + 
+                             currentBooking.seats.prime.length + 
+                             currentBooking.seats.vip.length;
+            
+            if (totalSeats === 0) {
+                alert("Please select at least one seat!");
+                return;
+            }
+            
+            // Update order summary
+            updateOrderSummary();
+            
+            // Switch to next step
+            document.getElementById("seatSelectionForm").classList.remove("active");
+            document.getElementById("userDetailsForm").classList.add("active");
+            document.getElementById("step1").classList.remove("active");
+            document.getElementById("step2").classList.add("active");
+        }
+        
+        function prevStep() {
+            document.getElementById("userDetailsForm").classList.remove("active");
+            document.getElementById("seatSelectionForm").classList.add("active");
+            document.getElementById("step2").classList.remove("active");
+            document.getElementById("step1").classList.add("active");
+        }
+        
+        // Update order summary
+        function updateOrderSummary() {
+            const standardTotal = currentBooking.seats.standard.length * currentBooking.basePrice;
+            const primeTotal = currentBooking.seats.prime.length * (currentBooking.basePrice + 50);
+            const vipTotal = currentBooking.seats.vip.length * (currentBooking.basePrice + 100);
+            const grandTotal = standardTotal + primeTotal + vipTotal;
+            
+            let summaryHTML = `
+                <div class="price-row">
+                    <span>${currentBooking.movie}</span>
+                    <span>${currentBooking.showTime}</span>
+                </div>
+                <div class="price-row">
+                    <span>Standard Seats (${currentBooking.seats.standard.length} × ₹${currentBooking.basePrice})</span>
+                    <span>₹${standardTotal}</span>
+                </div>`;
+            
+            if (currentBooking.seats.prime.length > 0) {
+                summaryHTML += `
+                <div class="price-row">
+                    <span>Prime Seats (${currentBooking.seats.prime.length} × ₹${currentBooking.basePrice + 50})</span>
+                    <span>₹${primeTotal}</span>
+                </div>`;
+            }
+            
+            if (currentBooking.seats.vip.length > 0) {
+                summaryHTML += `
+                <div class="price-row">
+                    <span>VIP Seats (${currentBooking.seats.vip.length} × ₹${currentBooking.basePrice + 100})</span>
+                    <span>₹${vipTotal}</span>
+                </div>`;
+            }
+            
+            document.getElementById("orderSummary").innerHTML = summaryHTML;
+            document.getElementById("finalPrice").textContent = "₹" + grandTotal;
+        }
+        
+        // Confirm booking
+        function confirmBooking() {
+        // Validate form
+        const name = document.getElementById("userName").value.trim();
+        const email = document.getElementById("userEmail").value.trim();
+        const phone = document.getElementById("userPhone").value.trim();
+        
+        if (!name || !email || !phone) {
+            alert("Please fill in all your details!");
+            return;
+        }
+        
+        // Save user details
+        currentBooking.userDetails = { name, email, phone };
+        
+        // Calculate total
+        const standardTotal = currentBooking.seats.standard.length * currentBooking.basePrice;
+        const primeTotal = currentBooking.seats.prime.length * (currentBooking.basePrice + 50);
+        const vipTotal = currentBooking.seats.vip.length * (currentBooking.basePrice + 100);
+        const grandTotal = standardTotal + primeTotal + vipTotal;
+        
+        // Show confirmation
+        document.getElementById("confirmationMovie").textContent = currentBooking.movie;
+        document.getElementById("confirmationDate").textContent = new Date().toLocaleDateString();
+        document.getElementById("confirmationTime").textContent = currentBooking.showTime;
+        
+        let seatsText = "";
+        if (currentBooking.seats.standard.length > 0) {
+            seatsText += "Standard: " + currentBooking.seats.standard.join(", ");
+        }
+        if (currentBooking.seats.prime.length > 0) {
+            if (seatsText) seatsText += " | ";
+            seatsText += "Prime: " + currentBooking.seats.prime.join(", ");
+        }
+        if (currentBooking.seats.vip.length > 0) {
+            if (seatsText) seatsText += " | ";
+            seatsText += "VIP: " + currentBooking.seats.vip.join(", ");
+        }
+        document.getElementById("confirmationSeats").textContent = seatsText;
+        
+        document.getElementById("confirmationTotal").textContent = "₹" + grandTotal;
+        document.getElementById("bookingId").textContent = currentBooking.bookingId;
+        document.getElementById("confirmationEmail").textContent = email;
+        
+        // Switch to confirmation screen
+        document.getElementById("userDetailsForm").classList.remove("active");
+        document.getElementById("confirmationScreen").classList.add("active");
+        document.getElementById("step2").classList.remove("active");
+        document.getElementById("step3").classList.add("active");
+        
+        // Save booking to localStorage
+        const bookingData = {
+            movie: currentBooking.movie,
+            date: new Date().toLocaleDateString(),
+            time: currentBooking.showTime,
+            seats: seatsText,
+            total: grandTotal,
+            bookingId: currentBooking.bookingId,
+            email: email
+        };
+        
+        // Retrieve existing bookings or initialize an empty array
+        let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+        bookings.push(bookingData);
+        localStorage.setItem("bookings", JSON.stringify(bookings));
+        
+        console.log("Booking confirmed:", currentBooking);
+    }
+
+    function saveBookingToHistory(totalPrice) {
+        // Get existing history or create empty array
+        let history = JSON.parse(localStorage.getItem('movieBookingHistory')) || [];
+        
+        // Add new booking
+        history.unshift({
+            movie: currentBooking.movie,
+            date: new Date().toLocaleDateString(),
+            time: currentBooking.showTime,
+            seats: {
+                standard: [...currentBooking.seats.standard],
+                prime: [...currentBooking.seats.prime],
+                vip: [...currentBooking.seats.vip]
+            },
+            total: totalPrice,
+            bookingId: currentBooking.bookingId
+        });
+        
+        // Keep only the last 10 bookings
+        if (history.length > 10) {
+            history = history.slice(0, 10);
+        }
+        
+        // Save back to localStorage
+        localStorage.setItem('movieBookingHistory', JSON.stringify(history));
+    }
+    function filterMovies(genre) {
+            // Update active emoji
+            document.querySelectorAll('.emoji-filter').forEach(emoji => {
+                emoji.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show all genre sections if 'all' is selected
+            if (genre === 'all') {
+                document.querySelectorAll('.genre-section').forEach(section => {
+                    section.style.display = 'block';
+                });
+                return;
+            }
+            
+            // Hide all sections first
+            document.querySelectorAll('.genre-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Show only the selected genre
+            const genreTitles = document.querySelectorAll('.genre-title');
+            genreTitles.forEach(title => {
+                if (title.textContent.toLowerCase().includes(genre)) {
+                    title.parentElement.style.display = 'block';
+                }
+            });
+        }
+        
+        // Your existing JavaScript functions...
+
+    function calculateTotalPrice() {
+        const standardTotal = currentBooking.seats.standard.length * currentBooking.basePrice;
+        const primeTotal = currentBooking.seats.prime.length * (currentBooking.basePrice + 50);
+        const vipTotal = currentBooking.seats.vip.length * (currentBooking.basePrice + 100);
+        return standardTotal + primeTotal + vipTotal;
+    }
+
+        
+        // Close modal  
+        function closeModal() {
+            document.getElementById("bookingModal").style.display = "none";
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target == document.getElementById("bookingModal")) {
+                closeModal();
+            }
+        }
+    </script>
+    <a href="index.html"
+    style="
+       position: fixed;
+       bottom: 20px;
+       right: 20px;
+       background-color: #2da0a8;
+       color: white;
+       padding: 10px 15px;
+       border-radius: 30px;
+       display: flex;
+       align-items: center;
+       gap: 8px;
+       font-size: 16px;
+       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+       z-index: 1000;
+       text-decoration: none;
+       font-weight: 600;
+    ">
+    <ion-icon name="home" style="font-size: 20px;"></ion-icon>
+    Home
+    </a>
+</body>
+</html>
